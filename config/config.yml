@@ -1,0 +1,3 @@
+app_info:
+  environment: development
+  api_port: :3000
