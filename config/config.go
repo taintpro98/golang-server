@@ -14,13 +14,22 @@ import (
 const KEY_CONFIG_URL = "--config_url"
 
 type Config struct {
-	AppInfo     ConfigAppInfo `mapstructure:"app_info"`
-	TelegramBot TelegramBot   `mapstructure:"telegram_bot"`
+	AppInfo     ConfigAppInfo  `mapstructure:"app_info"`
+	Database    DatabaseConfig `mapstructure:"database"`
+	TelegramBot TelegramBot    `mapstructure:"telegram_bot"`
 }
 
 type ConfigAppInfo struct {
 	Environment string `mapstructure:"environment"`
 	ApiPort     string `mapstructure:"api_port"`
+}
+
+type DatabaseConfig struct {
+	Host         string `mapstructure:"host"`
+	Port         string `mapstructure:"port"`
+	Username     string `mapstructure:"username"`
+	Password     string `mapstructure:"password"`
+	DatabaseName string `mapstructure:"database_name"`
 }
 
 type TelegramBot struct {

@@ -1,3 +1,10 @@
 app_info:
   environment: development
   api_port: :3000
+
+database:
+  host: localhost
+  port: 5433
+  username: root
+  password: 123456
+  database_name: golang-database
