@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+  database:
+    container_name: postgres-golang-database
+    image: postgres:14.1
+    restart: unless-stopped
+    volumes:
+      - golang-database:/var/lib/postgres
+#      - ./docker/postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: golang-database
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - 5433:5432
+    networks:
+      - golang-server-network
+
+networks:
+  golang-server-network:
+    driver: bridge
+
+volumes:
+  golang-database:
+    driver: local

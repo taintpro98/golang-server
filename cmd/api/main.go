@@ -7,6 +7,7 @@ import (
 	"golang-server/config"
 	"golang-server/middleware"
 	"golang-server/module/telegram"
+	"golang-server/pkg/database"
 	"golang-server/pkg/logger"
 	"golang-server/route"
 	"net/http"
@@ -21,6 +22,11 @@ func main() {
 	cnf := config.Init()
 	ctx := context.Background()
 
+	postgresqlDB, err := database.NewPostgresqlDatabase(cnf.Database)
+	if err != nil {
+		logger.Error(ctx, err, "init database error")
+	}
+
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(
@@ -32,7 +38,7 @@ func main() {
 		logger.Error(ctx, err, "init telegram bot error")
 	}
 	route.RegisterHealthCheckRoute(engine)
-	route.RegisterRoutes(engine, cnf, telegramBot)
+	route.RegisterRoutes(engine, cnf, postgresqlDB, telegramBot)
 	server := http.Server{
 		Addr:    cnf.AppInfo.ApiPort,
 		Handler: engine,
