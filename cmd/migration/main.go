@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"golang-server/config"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"log"
 	"os"
 	"path/filepath"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func migrateDB(db *gorm.DB, migrationDir string) error {
@@ -39,7 +40,7 @@ func migrateDB(db *gorm.DB, migrationDir string) error {
 	})
 }
 
-func main() {
+func test() {
 	cnf := config.Init()
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 		cnf.Database.Host,

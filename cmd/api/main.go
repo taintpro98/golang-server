@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"golang-server/config"
 	"golang-server/middleware"
 	"golang-server/module/telegram"
@@ -15,6 +14,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -57,7 +58,7 @@ func main() {
 	logger.Info(ctx, "Shutting down server...")
 
 	// Tạo một context để thông báo cho server biết rằng nó cần shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// Thực hiện graceful shutdown cho server
