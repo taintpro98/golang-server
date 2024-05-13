@@ -72,8 +72,12 @@ func getConfigUrl() string {
 	return configUrl
 }
 
-func loadConfigByLocalPath(v *viper.Viper) {
-	v.SetConfigName("config.local")
+func loadConfigByLocalPath(v *viper.Viper, envi string) {
+	configName := "config.local"
+	if envi != "" {
+		configName = fmt.Sprintf("config.%s", envi)
+	}
+	v.SetConfigName(configName)
 	v.AddConfigPath(".")          // Look for config in current directory
 	v.AddConfigPath("config/")    // Optionally look for config in the working directory.
 	v.AddConfigPath("../config/") // Look for config needed for tests.
@@ -104,7 +108,7 @@ func loadConfigByUrl(v *viper.Viper, configURL string) {
 	}
 }
 
-func Init() (config Config) {
+func Init(envi string) (config Config) {
 	v := viper.New()
 	v.SetConfigType("yaml")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "__"))
@@ -112,7 +116,7 @@ func Init() (config Config) {
 
 	configUrl := getConfigUrl()
 	if configUrl == "" {
-		loadConfigByLocalPath(v)
+		loadConfigByLocalPath(v, envi)
 	} else {
 		loadConfigByUrl(v, configUrl)
 	}

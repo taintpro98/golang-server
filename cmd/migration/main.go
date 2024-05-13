@@ -1,63 +1,42 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"flag"
 	"golang-server/config"
+	"golang-server/pkg/database"
 	"log"
-	"os"
-	"path/filepath"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/pressly/goose/v3"
 )
 
-func migrateDB(db *gorm.DB, migrationDir string) error {
-	//migrator := db.Migrator()
-	//
-	//files, err := os.ReadDir(migrationDir)
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Printf("xxx", files)
-	//return nil
+func main() {
+	envi := flag.String("e", "", "Environment option")
+	dir := flag.String("dir", "migrations", "Path to migrations")
+	flag.Parse()
+	args := flag.Args()
+	command := args[0]
 
-	// Sort the migration files based on their version number
-	return filepath.Walk(migrationDir, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() && info.Mode().IsRegular() && info.Name() != ".gitkeep" {
-			contents, err := os.ReadFile(path)
-			if err != nil {
-				return err
-			}
-
-			// Execute the SQL statements in the migration file
-			rawSQL := string(contents)
-			if err := db.Exec(rawSQL).Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-}
-
-func test() {
-	cnf := config.Init()
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
-		cnf.Database.Host,
-		cnf.Database.Username,
-		cnf.Database.Password,
-		cnf.Database.DatabaseName,
-		cnf.Database.Port,
-	)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	}
-	err = migrateDB(db, "./migrations")
+	ctx := context.Background()
+	cnf := config.Init(*envi)
+	dsn := database.GetDatabaseDSN(cnf.Database)
+	db, err := goose.OpenDBWithDriver("postgres", dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Database migration completed successfully!")
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Fatalf("goose: failed to close DB: %v\n", err)
+		}
+	}()
+
+	arguments := []string{}
+	if len(args) > 1 {
+		arguments = append(arguments, args[1:]...)
+	}
+
+	if err := goose.RunContext(ctx, command, db, *dir, arguments...); err != nil {
+		log.Fatalf("goose %v: %v", command, err)
+	}
 }

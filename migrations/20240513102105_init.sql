@@ -1,3 +1,5 @@
+-- +goose Up
+-- +goose StatementBegin
 CREATE
 EXTENSION IF NOT EXISTS "uuid-ossp"; -- dong nay de tu dong sinh uuid
 
@@ -8,3 +10,9 @@ create table users
     phone varchar not null,
     email varchar null
 );
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+SELECT 'down SQL query';
+-- +goose StatementEnd

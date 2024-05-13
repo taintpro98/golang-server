@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"golang-server/config"
 	"golang-server/middleware"
 	"golang-server/module/telegram"
@@ -20,7 +21,9 @@ import (
 
 func main() {
 	logger.InitLogger("api-service")
-	cnf := config.Init()
+	envi := flag.String("e", "", "Environment option")
+	flag.Parse()
+	cnf := config.Init(*envi)
 	ctx := context.Background()
 
 	postgresqlDB, err := database.NewPostgresqlDatabase(cnf.Database)
