@@ -13,6 +13,15 @@ create table users (
     "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+create table posts(
+    id uuid DEFAULT uuid_generate_v4() primary key,
+    user_id uuid not null,
+    title varchar not null,
+    content varchar null,
+    "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

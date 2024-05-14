@@ -59,6 +59,7 @@ type ConfigAppInfo struct {
 }
 
 type DatabaseConfig struct {
+	Schema       string `mapstructure:"schema"`
 	Host         string `mapstructure:"host"`
 	Port         string `mapstructure:"port"`
 	Username     string `mapstructure:"username"`

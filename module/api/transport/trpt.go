@@ -1,10 +1,12 @@
 package transport
 
 import (
-	"github.com/gin-gonic/gin"
 	"golang-server/module/api/business"
 	"golang-server/module/api/dto"
+	"golang-server/pkg/logger"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Transport struct {
@@ -22,7 +24,7 @@ func NewTransport(
 func (t *Transport) CreateUser(ctx *gin.Context) {
 	var data dto.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&data); err != nil {
-
+		logger.Error(ctx, err, "ddd")
 	}
 	result, err := t.biz.CreateUser(ctx, data)
 	if err != nil {
