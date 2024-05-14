@@ -26,3 +26,6 @@ redis_queue:
   username: root
   password: 123456
   db: 1
+
+telegram_bot:
+  token: abc

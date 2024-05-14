@@ -27,13 +27,17 @@ func main() {
 	cnf := config.Init(*envi)
 	ctx := context.Background()
 
-	postgresqlDB, err := database.NewPostgresqlDatabase(cnf.Database)
+	postgresqlDB, err := database.NewPostgresqlDatabase(ctx, cnf.Database)
 	if err != nil {
 		logger.Panic(ctx, err, "init database error")
 	}
 	redisClient, err := cache.NewRedisClient(ctx, cnf.Redis)
 	if err != nil {
 		logger.Panic(ctx, err, "init redis cache error")
+	}
+	telegramBot, err := telegram.NewTelegramBot(cnf.TelegramBot)
+	if err != nil {
+		logger.Error(ctx, err, "init telegram bot error")
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -42,10 +46,7 @@ func main() {
 		middleware.LogRequestInfo(),
 		gin.Recovery(),
 	)
-	telegramBot, err := telegram.NewTelegramBot(cnf.TelegramBot)
-	if err != nil {
-		logger.Error(ctx, err, "init telegram bot error")
-	}
+
 	route.RegisterHealthCheckRoute(engine)
 	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, telegramBot)
 	server := http.Server{

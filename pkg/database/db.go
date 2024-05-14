@@ -1,19 +1,32 @@
 package database
 
 import (
+	"context"
 	"fmt"
 	"golang-server/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-func NewPostgresqlDatabase(databaseCnf config.DatabaseConfig) (*gorm.DB, error) {
+func NewPostgresqlDatabase(ctx context.Context, databaseCnf config.DatabaseConfig) (*gorm.DB, error) {
 	dsn := GetDatabaseDSN(databaseCnf)
-	return gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+	client, err := gorm.Open(postgres.New(
+		postgres.Config{
+			DSN:                  dsn,
+			PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
+		},
+	), &gorm.Config{
+		// Logger: logger.Default.LogMode(logger.Silent),
 	})
+	if err != nil {
+		return nil, err
+	}
+	_, err = client.DB()
+	if err != nil {
+		return nil, err
+	}
+	return client, err
 }
 
 func GetDatabaseDSN(cnf config.DatabaseConfig) string {
