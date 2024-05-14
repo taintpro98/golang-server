@@ -19,7 +19,20 @@ type Config struct {
 	Database    DatabaseConfig   `mapstructure:"database"`
 	Redis       RedisConfig      `mapstructure:"redis"`
 	RedisQueue  RedisQueueConfig `mapstructure:"redis_queue"`
+	Kafka       KafkaConfig      `mapstructure:"kafka"`
 	TelegramBot TelegramBot      `mapstructure:"telegram_bot"`
+}
+
+type KafkaConfig struct {
+	Uri         string     `mapstructure:"uri"`
+	Consumer    string     `mapstructure:"consumer"`
+	Partitioner string     `mapstructure:"partitioner"` // "The partitioning scheme to use. Can be `hash`, `manual`, or `random`")
+	Topic       KafkaTopic `mapstructure:"topic"`
+	// Sasl        KafkaSasl  `mapstructure:"sasl"`
+}
+
+type KafkaTopic struct {
+	UserTopic string `mapstructure:"user_topic"`
 }
 
 type RedisQueueConfig struct {

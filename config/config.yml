@@ -27,5 +27,16 @@ redis_queue:
   password: 123456
   db: 1
 
+kafka:
+  uri: localhost:9092
+  consumer: loyalty.event_dispatcher.consumer
+  partitioner: "random"
+  topic:
+    order_service_result: order-service.order-status
+    account_service_user_profile_created: account-service.user.profile.created
+  sasl:
+    consumer_user: ride-sharing-msk-staging
+    consumer_password: jdbO8q95ES0B
+
 telegram_bot:
   token: abc

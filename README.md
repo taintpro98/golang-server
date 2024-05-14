@@ -1,9 +1,17 @@
 curl http://localhost:3000/health
 
 ### Docker
-- Xoa cac container khong trong file docker-compose.dev.yml
+- Remove containers not in the file docker-compose.dev.yml
   ```
   docker-compose -f docker-compose.dev.yml up --build -d --remove-orphans 
+  ```
+- Run kafka containers
+  ```
+  docker-compose -f docker-compose.kafka.yml up --build -d
+  ```
+- Run elastic containers
+  ```
+  docker-compose -f docker-compose.elastic.yml up --build -d
   ```
 
 ### Database
