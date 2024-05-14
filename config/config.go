@@ -2,13 +2,14 @@ package config
 
 import (
 	"fmt"
-	"github.com/inhies/go-bytesize"
-	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/inhies/go-bytesize"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 )
 
 const KEY_CONFIG_URL = "--config_url"
@@ -16,7 +17,17 @@ const KEY_CONFIG_URL = "--config_url"
 type Config struct {
 	AppInfo     ConfigAppInfo  `mapstructure:"app_info"`
 	Database    DatabaseConfig `mapstructure:"database"`
+	Redis       RedisConfig    `mapstructure:"redis"`
 	TelegramBot TelegramBot    `mapstructure:"telegram_bot"`
+}
+
+type RedisConfig struct {
+	Prefix   string `mapstructure:"prefix"`
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	DB       string `mapstructure:"db"`
 }
 
 type ConfigAppInfo struct {

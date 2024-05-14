@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,4 +21,8 @@ func Info(ctx context.Context, msg string) {
 
 func Error(ctx context.Context, err error, msg string) {
 	log.Error().Stack().Err(err).Msg(msg)
+}
+
+func Panic(ctx context.Context, err error, msg string, fields ...LogField) {
+	log.Panic().Stack().Err(err).Msg(msg)
 }

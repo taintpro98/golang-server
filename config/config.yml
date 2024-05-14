@@ -2,7 +2,7 @@ enable_swagger: true
 
 app_info:
   environment: development
-  api_port: :3000
+  api_port: :5000
 
 database:
   host: localhost
@@ -10,3 +10,11 @@ database:
   username: root
   password: 123456
   database_name: golang-database
+
+redis:
+  host: localhost
+  port: 6380
+  prefix: golang-server
+  username: root
+  password: 123456
+  db: 0

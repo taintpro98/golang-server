@@ -7,6 +7,7 @@ import (
 	"golang-server/config"
 	"golang-server/middleware"
 	"golang-server/module/telegram"
+	"golang-server/pkg/cache"
 	"golang-server/pkg/database"
 	"golang-server/pkg/logger"
 	"golang-server/route"
@@ -28,7 +29,11 @@ func main() {
 
 	postgresqlDB, err := database.NewPostgresqlDatabase(cnf.Database)
 	if err != nil {
-		logger.Error(ctx, err, "init database error")
+		logger.Panic(ctx, err, "init database error")
+	}
+	redisClient, err := cache.NewRedisClient(ctx, cnf.Redis)
+	if err != nil {
+		logger.Panic(ctx, err, "init redis cache error")
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -42,7 +47,7 @@ func main() {
 		logger.Error(ctx, err, "init telegram bot error")
 	}
 	route.RegisterHealthCheckRoute(engine)
-	route.RegisterRoutes(engine, cnf, postgresqlDB, telegramBot)
+	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, telegramBot)
 	server := http.Server{
 		Addr:    cnf.AppInfo.ApiPort,
 		Handler: engine,

@@ -18,6 +18,16 @@ services:
     networks:
       - golang-server-network
 
+  redis:
+    container_name: golang-redis
+    image: redis:latest
+    ports:
+      - 6380:6379
+    volumes:
+      - /docker/redis-data/:/data
+    networks:
+      - golang-server-network
+
 networks:
   golang-server-network:
     driver: bridge
