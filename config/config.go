@@ -15,10 +15,20 @@ import (
 const KEY_CONFIG_URL = "--config_url"
 
 type Config struct {
-	AppInfo     ConfigAppInfo  `mapstructure:"app_info"`
-	Database    DatabaseConfig `mapstructure:"database"`
-	Redis       RedisConfig    `mapstructure:"redis"`
-	TelegramBot TelegramBot    `mapstructure:"telegram_bot"`
+	AppInfo     ConfigAppInfo    `mapstructure:"app_info"`
+	Database    DatabaseConfig   `mapstructure:"database"`
+	Redis       RedisConfig      `mapstructure:"redis"`
+	RedisQueue  RedisQueueConfig `mapstructure:"redis_queue"`
+	TelegramBot TelegramBot      `mapstructure:"telegram_bot"`
+}
+
+type RedisQueueConfig struct {
+	Prefix   string `mapstructure:"prefix"`
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	DB       string `mapstructure:"db"`
 }
 
 type RedisConfig struct {

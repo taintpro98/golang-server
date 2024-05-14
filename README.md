@@ -1,7 +1,7 @@
 curl http://localhost:3000/health
 
 ### Docker
-- Ghi de cac container cu va xoa cac container khong trong file docker-compose.dev.yml
+- Xoa cac container khong trong file docker-compose.dev.yml
   ```
   docker-compose -f docker-compose.dev.yml up --build -d --remove-orphans 
   ```

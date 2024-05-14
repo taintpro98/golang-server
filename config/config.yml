@@ -18,3 +18,11 @@ redis:
   username: root
   password: 123456
   db: 0
+
+redis_queue:
+  host: localhost
+  port: 6380
+  prefix: golang-server
+  username: root
+  password: 123456
+  db: 1
