@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rs/zerolog/log"
 )
@@ -15,7 +16,8 @@ func InitLogger(serviceName string) {
 	log.Logger = log.With().Str("service", serviceName).Logger()
 }
 
-func Info(ctx context.Context, msg string) {
+func Info(ctx context.Context, msg string, fields ...LogField) {
+	fmt.Println("fields", fields)
 	log.Info().Msg(msg)
 }
 

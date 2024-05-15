@@ -26,10 +26,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 	userApi := publicApi.Group("/user")
 	{
 		userApi.POST("", trpt.CreateUser)
-	}
-
-	sportApi := publicApi.Group("/sport")
-	{
-		sportApi.GET("/", trpt.GetSports)
+		userApi.GET("/posts", trpt.GetUserPosts)
+		userApi.GET("/posts/:postID", trpt.GetUserPostByID)
 	}
 }

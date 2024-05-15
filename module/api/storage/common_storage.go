@@ -2,12 +2,22 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"golang-server/config"
+	"golang-server/module/api/dto"
 	"golang-server/pkg/logger"
 
 	"gorm.io/gorm"
 )
+
+type CommonStorageParams struct {
+	TableName    string
+	Query        *gorm.DB
+	CommonFilter dto.CommonFilter
+	Filter       interface{}
+	Data         interface{}
+}
 
 type commonStorage struct {
 	db       *gorm.DB
@@ -18,30 +28,74 @@ func (s commonStorage) table(tableName string) *gorm.DB {
 	return s.db.Table(fmt.Sprintf("%s.%s", s.configDb.Schema, tableName))
 }
 
-func (s commonStorage) BuildQuery(filter interface{}) *gorm.DB {
-	panic("")
+func (s commonStorage) CFindOne(ctx context.Context, param CommonStorageParams) error {
+	logger.Info(ctx, fmt.Sprintf("CFindOne %s table", param.TableName), logger.LogField{
+		Key:   "param",
+		Value: param,
+	})
+	if len(param.CommonFilter.Select) > 0 {
+		param.Query = param.Query.Select(param.CommonFilter.Select)
+	}
+	tx := param.Query.First(param.Data)
+	if tx.Error != nil {
+		logger.Error(ctx, tx.Error, fmt.Sprintf("find one %s error", param.TableName))
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+			return nil
+		}
+	}
+	return tx.Error
 }
 
-func (s commonStorage) CInsert(ctx context.Context, tableName string, data interface{}) error {
-	logger.Info(ctx, fmt.Sprintf("%s insert", tableName))
-	err := s.table(tableName).Create(data).Error
+func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) error {
+	logger.Info(ctx, fmt.Sprintf("CList %s table", param.TableName), logger.LogField{
+		Key:   "param",
+		Value: param,
+	})
+	if param.CommonFilter.Limit != 0 {
+		param.Query = param.Query.Limit(param.CommonFilter.Limit)
+	}
+	if param.CommonFilter.Offset != nil {
+		param.Query = param.Query.Offset(*param.CommonFilter.Offset)
+	}
+	if param.CommonFilter.Sort != "" {
+		param.Query = param.Query.Order(param.CommonFilter.Sort)
+	}
+	if len(param.CommonFilter.Select) > 0 {
+		param.Query = param.Query.Select(param.CommonFilter.Select)
+	}
+	tx := param.Query.Find(param.Data) // day la contro vao bien ket qua
+	if tx.Error != nil {
+		logger.Error(
+			ctx,
+			tx.Error,
+			fmt.Sprintf("list %s error", param.TableName),
+		)
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+			return nil
+		}
+	}
+	return tx.Error
+}
+
+func (s commonStorage) CInsert(ctx context.Context, param CommonStorageParams) error {
+	logger.Info(ctx, fmt.Sprintf("CInsert %s table", param.TableName))
+	err := s.table(param.TableName).Create(param.Data).Error
 	if err != nil {
 		logger.Error(
 			ctx,
 			err,
-			fmt.Sprintf("insert %s data error", tableName),
+			fmt.Sprintf("insert %s data error", param.TableName),
 		)
 	}
 	return err
 }
 
-func (s commonStorage) CUpdateMany(ctx context.Context, tableName string, filter interface{}, data interface{}) error {
-	logger.Info(ctx, fmt.Sprintf("%s insert", tableName))
-	query := s.BuildQuery(filter)
-	tx := query.Updates(data)
+func (s commonStorage) CUpdateMany(ctx context.Context, param CommonStorageParams) error {
+	logger.Info(ctx, fmt.Sprintf("CUpdateMany %s table", param.TableName))
+	tx := param.Query.Updates(param.Data)
 
 	if tx.Error != nil {
-		logger.Error(ctx, tx.Error, fmt.Sprintf("Failed to update %s", tableName))
+		logger.Error(ctx, tx.Error, fmt.Sprintf("Failed to update many %s", param.TableName))
 		return tx.Error
 	}
 	return nil

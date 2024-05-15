@@ -30,5 +30,8 @@ func (u userStorage) tableName() string {
 }
 
 func (u userStorage) Insert(ctx context.Context, data *model.UserModel) error {
-	return u.CInsert(ctx, u.tableName(), data)
+	return u.CInsert(ctx, CommonStorageParams{
+		TableName: u.tableName(),
+		Data:      data,
+	})
 }

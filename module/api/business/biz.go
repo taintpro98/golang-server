@@ -12,6 +12,10 @@ import (
 type IBiz interface {
 	CreateUser(ctx context.Context, data dto.CreateUserRequest) (*model.UserModel, error)
 
+	GetUserPosts(ctx context.Context, userID string) ([]model.PostModel, error)
+
+	GetUserPostByID(ctx context.Context, postID string) (model.PostModel, error)
+
 	GetSports(ctx context.Context) error
 }
 

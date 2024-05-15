@@ -6,9 +6,9 @@ services:
     image: postgres:14.1
     restart: unless-stopped
     volumes:
-      - /docker/postgres-data/:/var/lib/postgresql/data
-#      - ./docker/postgres:/docker-entrypoint-initdb.d
-#      - golang-database:/var/lib/postgres
+      # - ./docker/postgres-data/:/var/lib/postgresql/data
+      - golang-database:/var/lib/postgres
+      - ./docker/postgres-data:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_DB: golang-database
       POSTGRES_USER: root
