@@ -5,8 +5,8 @@ import (
 	"golang-server/module/api/business"
 	"golang-server/module/api/storage"
 	"golang-server/module/api/transport"
-	"golang-server/module/telegram"
 	"golang-server/pkg/cache"
+	"golang-server/pkg/telegram"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -18,14 +18,14 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 	biz := business.NewBiz(
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewPostStorage(cnf.Database, db),
-		bot,
+		storage.NewNotificationStorage(bot),
 	)
 	trpt := transport.NewTransport(biz)
 	publicApi := v1Api.Group("/public")
+	publicApi.POST("/register", trpt.Register)
 
 	userApi := publicApi.Group("/user")
 	{
-		userApi.POST("", trpt.CreateUser)
 		userApi.GET("/posts", trpt.GetUserPosts)
 		userApi.GET("/posts/:postID", trpt.GetUserPostByID)
 	}

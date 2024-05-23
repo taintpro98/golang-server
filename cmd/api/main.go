@@ -6,10 +6,10 @@ import (
 	"flag"
 	"golang-server/config"
 	"golang-server/middleware"
-	"golang-server/module/telegram"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/database"
 	"golang-server/pkg/logger"
+	"golang-server/pkg/telegram"
 	"golang-server/route"
 	"net/http"
 	"os"
@@ -39,6 +39,10 @@ func main() {
 	if err != nil {
 		logger.Error(ctx, err, "init telegram bot error")
 	}
+	// err = telegramBot.GetMessages(ctx)
+	// if err != nil {
+	// 	logger.Error(ctx, err, "telegram bot get messages error")
+	// }
 
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()

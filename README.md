@@ -1,3 +1,8 @@
+### Note
+- Elastic Search
+- Big Query 
+- Kafka
+
 curl http://localhost:3000/health
 
 ### Docker

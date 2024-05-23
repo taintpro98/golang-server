@@ -8,3 +8,7 @@ type CreateUserRequest struct {
 type GetUserPostsRequest struct {
 	UserID string `json:"user_id"`
 }
+
+type UserCreatedNotification struct {
+	UserID string `json:"user_id"`
+}

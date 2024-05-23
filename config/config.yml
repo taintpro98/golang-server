@@ -40,3 +40,4 @@ kafka:
 
 telegram_bot:
   token: abc
+  chat_id: 123

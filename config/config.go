@@ -68,7 +68,8 @@ type DatabaseConfig struct {
 }
 
 type TelegramBot struct {
-	Token string `mapstructure:"token"`
+	ChatID int64  `mapstructure:"chat_id"`
+	Token  string `mapstructure:"token"`
 }
 
 // hex string to bytesize.ByteSize.

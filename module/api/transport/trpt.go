@@ -21,12 +21,12 @@ func NewTransport(
 	}
 }
 
-func (t *Transport) CreateUser(ctx *gin.Context) {
+func (t *Transport) Register(ctx *gin.Context) {
 	var data dto.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		logger.Error(ctx, err, "ddd")
 	}
-	result, err := t.biz.CreateUser(ctx, data)
+	result, err := t.biz.Register(ctx, data)
 	if err != nil {
 
 	} else {

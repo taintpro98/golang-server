@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang-server/app/worker/task"
 	"golang-server/pkg/logger"
+	"time"
 
 	"github.com/hibiken/asynq"
 )
@@ -23,7 +24,12 @@ func (processor *asynqTaskProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		logger.Error(ctx, err, fmt.Sprintf("json.Unmarshal failed: %v: %v", err, asynq.SkipRetry))
 		return asynq.SkipRetry
 	}
-	// data := p.Data
-	logger.Info(ctx, "Sub Publish Voucher data from async queue")
+	data := p.Data
+	logger.Info(ctx, "asynqTaskProcessor ProcessTask", logger.LogField{
+		Key:   "data",
+		Value: data,
+	})
+	duration := time.Duration(5) * time.Second
+	<-time.After(duration)
 	return nil
 }

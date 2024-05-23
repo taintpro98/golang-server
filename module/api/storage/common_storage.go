@@ -30,8 +30,14 @@ func (s commonStorage) table(tableName string) *gorm.DB {
 
 func (s commonStorage) CFindOne(ctx context.Context, param CommonStorageParams) error {
 	logger.Info(ctx, fmt.Sprintf("CFindOne %s table", param.TableName), logger.LogField{
-		Key:   "param",
-		Value: param,
+		Key:   "data",
+		Value: param.Data,
+	}, logger.LogField{
+		Key:   "filter",
+		Value: param.Filter,
+	}, logger.LogField{
+		Key:   "common_filter",
+		Value: param.CommonFilter,
 	})
 	if len(param.CommonFilter.Select) > 0 {
 		param.Query = param.Query.Select(param.CommonFilter.Select)
@@ -48,8 +54,14 @@ func (s commonStorage) CFindOne(ctx context.Context, param CommonStorageParams) 
 
 func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) error {
 	logger.Info(ctx, fmt.Sprintf("CList %s table", param.TableName), logger.LogField{
-		Key:   "param",
-		Value: param,
+		Key:   "data",
+		Value: param.Data,
+	}, logger.LogField{
+		Key:   "filter",
+		Value: param.Filter,
+	}, logger.LogField{
+		Key:   "common_filter",
+		Value: param.CommonFilter,
 	})
 	if param.CommonFilter.Limit != 0 {
 		param.Query = param.Query.Limit(param.CommonFilter.Limit)
@@ -78,25 +90,60 @@ func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) err
 }
 
 func (s commonStorage) CInsert(ctx context.Context, param CommonStorageParams) error {
-	logger.Info(ctx, fmt.Sprintf("CInsert %s table", param.TableName))
-	err := s.table(param.TableName).Create(param.Data).Error
-	if err != nil {
+	logger.Info(ctx, fmt.Sprintf("CInsert %s table", param.TableName), logger.LogField{
+		Key:   "data",
+		Value: param.Data,
+	}, logger.LogField{
+		Key:   "filter",
+		Value: param.Filter,
+	}, logger.LogField{
+		Key:   "common_filter",
+		Value: param.CommonFilter,
+	})
+	tx := s.table(param.TableName).Create(param.Data)
+	if tx.Error != nil {
 		logger.Error(
 			ctx,
-			err,
+			tx.Error,
 			fmt.Sprintf("insert %s data error", param.TableName),
 		)
 	}
-	return err
+	return tx.Error
 }
 
 func (s commonStorage) CUpdateMany(ctx context.Context, param CommonStorageParams) error {
-	logger.Info(ctx, fmt.Sprintf("CUpdateMany %s table", param.TableName))
+	logger.Info(ctx, fmt.Sprintf("CUpdateMany %s table", param.TableName), logger.LogField{
+		Key:   "data",
+		Value: param.Data,
+	}, logger.LogField{
+		Key:   "filter",
+		Value: param.Filter,
+	}, logger.LogField{
+		Key:   "common_filter",
+		Value: param.CommonFilter,
+	})
 	tx := param.Query.Updates(param.Data)
 
 	if tx.Error != nil {
 		logger.Error(ctx, tx.Error, fmt.Sprintf("Failed to update many %s", param.TableName))
-		return tx.Error
 	}
-	return nil
+	return tx.Error
+}
+
+func (s commonStorage) CDelete(ctx context.Context, param CommonStorageParams) error {
+	logger.Info(ctx, fmt.Sprintf("CDelete %s table", param.TableName), logger.LogField{
+		Key:   "data",
+		Value: param.Data,
+	}, logger.LogField{
+		Key:   "filter",
+		Value: param.Filter,
+	}, logger.LogField{
+		Key:   "common_filter",
+		Value: param.CommonFilter,
+	})
+	tx := param.Query.Delete(param.Data)
+	if tx.Error != nil {
+		logger.Error(ctx, tx.Error, fmt.Sprintf("Failed to delete %s", param.TableName))
+	}
+	return tx.Error
 }
