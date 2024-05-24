@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- dong nay de tu dong sinh uuid
 DROP TABLE IF EXISTS users;
 
-create table users (
+create table public.users (
     id uuid DEFAULT uuid_generate_v4() primary key,
     phone varchar not null,
     email varchar null,
@@ -13,11 +13,19 @@ create table users (
     "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create table posts(
+create table public.rooms(
+    id bigserial primary key,
+    name varchar not null,
+    "seats" varchar [] not null,
+    "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+create table public.movies(
     id uuid DEFAULT uuid_generate_v4() primary key,
-    user_id uuid not null,
     title varchar not null,
-    content varchar null,
+    content text null,
+    videos jsonb null,
     "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );

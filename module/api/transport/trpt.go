@@ -3,7 +3,6 @@ package transport
 import (
 	"golang-server/module/api/business"
 	"golang-server/module/api/dto"
-	"golang-server/pkg/logger"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,8 @@ func NewTransport(
 func (t *Transport) Register(ctx *gin.Context) {
 	var data dto.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&data); err != nil {
-		logger.Error(ctx, err, "ddd")
+		dto.HandleResponse(ctx, data, err)
+		return
 	}
 	result, err := t.biz.Register(ctx, data)
 	if err != nil {
@@ -32,8 +32,4 @@ func (t *Transport) Register(ctx *gin.Context) {
 	} else {
 		ctx.JSON(http.StatusCreated, result)
 	}
-}
-
-func (t *Transport) GetSports(ctx *gin.Context) {
-	_ = t.biz.GetSports(ctx)
 }

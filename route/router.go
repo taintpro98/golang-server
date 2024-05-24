@@ -17,16 +17,32 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 
 	biz := business.NewBiz(
 		storage.NewUserStorage(cnf.Database, db),
-		storage.NewPostStorage(cnf.Database, db),
+		storage.NewMovieStorage(cnf.Database, db),
 		storage.NewNotificationStorage(bot),
 	)
 	trpt := transport.NewTransport(biz)
 	publicApi := v1Api.Group("/public")
-	publicApi.POST("/register", trpt.Register)
-
-	userApi := publicApi.Group("/user")
 	{
-		userApi.GET("/posts", trpt.GetUserPosts)
-		userApi.GET("/posts/:postID", trpt.GetUserPostByID)
+		publicApi.POST("/register", trpt.Register)
+
+		slotApi := publicApi.Group("/slots")
+		{
+			slotApi.GET("", trpt.GetMovieSlotInfo)
+		}
+
+		movieApi := publicApi.Group("/movies")
+		{
+			movieApi.GET("", trpt.ListMovies)
+		}
+	}
+
+	// admin api
+
+	adminApi := v1Api.Group("/admin")
+	{
+		movieApi := adminApi.Group("/movies")
+		{
+			movieApi.POST("", trpt.AdminCreateMovie)
+		}
 	}
 }

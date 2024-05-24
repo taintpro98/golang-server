@@ -10,28 +10,27 @@ import (
 
 type IBiz interface {
 	Register(ctx context.Context, data dto.CreateUserRequest) (*model.UserModel, error)
+	GetMovieSlotInfo(ctx context.Context, data dto.GetMovieSlotInfoRequest) (dto.GetMovieSlotInfoResponse, error)
 
-	GetUserPosts(ctx context.Context, userID string) ([]model.PostModel, error)
-
-	GetUserPostByID(ctx context.Context, postID string) (model.PostModel, error)
-
-	GetSports(ctx context.Context) error
+	// movie
+	ListMovies(ctx context.Context, data dto.ListMoviesRequest) (dto.ListMoviesResponse, *int64, error)
+	AdminCreateMovie(ctx context.Context, data dto.AdminCreateMovieRequest) (dto.AdminCreateMovieResponse, error)
 }
 
 type biz struct {
 	userStorage         storage.IUserStorage
-	postStorage         storage.IPostStorage
+	movieStorage        storage.IMovieStorage
 	notificationStorage storage.INotificationStorage
 }
 
 func NewBiz(
 	userStorage storage.IUserStorage,
-	postStorage storage.IPostStorage,
+	movieStorage storage.IMovieStorage,
 	notificationStorage storage.INotificationStorage,
 ) IBiz {
 	return biz{
 		userStorage:         userStorage,
-		postStorage:         postStorage,
+		movieStorage:        movieStorage,
 		notificationStorage: notificationStorage,
 	}
 }

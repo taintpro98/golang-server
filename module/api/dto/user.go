@@ -1,12 +1,15 @@
 package dto
 
+type CommonFilter struct {
+	Limit  int
+	Offset *int
+	Select []string
+	Sort   string
+}
+
 type CreateUserRequest struct {
 	Phone string `json:"phone"`
 	Email string `json:"email"`
-}
-
-type GetUserPostsRequest struct {
-	UserID string `json:"user_id"`
 }
 
 type UserCreatedNotification struct {
