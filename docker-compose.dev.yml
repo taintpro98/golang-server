@@ -24,7 +24,7 @@ services:
     ports:
       - 6380:6379
     volumes:
-      - ./docker/redis-data/:/data
+      - ./docker/redis-data:/data
     networks:
       - golang-server-network
 
