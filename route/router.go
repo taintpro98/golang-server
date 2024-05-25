@@ -19,8 +19,12 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewMovieStorage(cnf.Database, db),
 		storage.NewNotificationStorage(bot),
+		storage.NewSlotStorage(cnf.Database, db),
+		storage.NewRoomStorage(cnf.Database, db),
 	)
 	trpt := transport.NewTransport(biz)
+
+	// public api
 	publicApi := v1Api.Group("/public")
 	{
 		publicApi.POST("/register", trpt.Register)
@@ -28,6 +32,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		slotApi := publicApi.Group("/slots")
 		{
 			slotApi.GET("", trpt.GetMovieSlotInfo)
+			slotApi.POST("", trpt.ReserveSeats)
 		}
 
 		movieApi := publicApi.Group("/movies")
@@ -37,12 +42,21 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 	}
 
 	// admin api
-
 	adminApi := v1Api.Group("/admin")
 	{
 		movieApi := adminApi.Group("/movies")
 		{
 			movieApi.POST("", trpt.AdminCreateMovie)
+		}
+
+		slotApi := adminApi.Group("/slots")
+		{
+			slotApi.POST("", trpt.AdminCreateSlot)
+		}
+
+		roomApi := adminApi.Group("/rooms")
+		{
+			roomApi.POST("", trpt.AdminCreateRoom)
 		}
 	}
 }

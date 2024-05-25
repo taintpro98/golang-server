@@ -12,8 +12,8 @@ type MovieModel struct {
 	Title     string          `json:"title,omitempty" gorm:"column:title"`
 	Content   string          `json:"content,omitempty" gorm:"column:content"`
 	Videos    *VideosDBStruct `json:"videos,omitempty" gorm:"column:videos"`
-	CreatedAt time.Time       `json:"created_at,omitempty" gorm:"column:created_at"`
-	UpdatedAt time.Time       `json:"updated_at,omitempty" gorm:"column:updated_at"`
+	CreatedAt *time.Time      `json:"created_at,omitempty" gorm:"column:created_at"`
+	UpdatedAt *time.Time      `json:"updated_at,omitempty" gorm:"column:updated_at"`
 }
 
 func (MovieModel) TableName() string {

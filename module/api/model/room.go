@@ -10,9 +10,8 @@ import (
 type RoomModel struct {
 	ID        int64      `json:"id,omitempty" gorm:"column:id"`
 	Name      string     `json:"name,omitempty" gorm:"column:name"`
-	Seats     SeatsSlide `json:"seats,omitempty" gorm:"column:seats"` // danh sach ghe phai dung thu tu
-	CreatedAt time.Time  `json:"created_at,omitempty" gorm:"column:created_at"`
-	UpdatedAt time.Time  `json:"updated_at,omitempty" gorm:"column:updated_at"`
+	CreatedAt *time.Time `json:"created_at,omitempty" gorm:"column:created_at"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty" gorm:"column:updated_at"`
 }
 
 func (RoomModel) TableName() string {

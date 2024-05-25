@@ -8,9 +8,9 @@ type Paginate struct {
 }
 
 type PaginateResponse struct {
-	Limit  int   `json:"limit"`
-	Offset int   `json:"offset"`
-	Total  int64 `json:"total"`
+	Limit  int    `json:"limit,omitempty"`
+	Offset int    `json:"offset,omitempty"`
+	Total  *int64 `json:"total,omitempty"`
 }
 
 func (p Paginate) InfoPaginate() (int, int) {

@@ -20,5 +20,13 @@ curl http://localhost:3000/health
   ```
 
 ### Database
-- go run ./cmd/migration/main.go -dir migrations create ${FILE_NAME} sql
-- go run ./cmd/migration/main.go -dir migrations up
+#### Migrations
+```
+go run ./cmd/migration/main.go -dir migrations create ${FILE_NAME} sql
+go run ./cmd/migration/main.go -dir migrations up
+```
+#### Seeds
+```
+go run ./cmd/migration/main.go -dir seeds create ${FILE_NAME} sql
+go run ./cmd/migration/main.go -dir seeds up
+```

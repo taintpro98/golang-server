@@ -9,20 +9,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type IMovieStorage interface {
-	Count(ctx context.Context, filter dto.FilterMovie) (*int64, error)
+type ISlotStorage interface {
+	Count(ctx context.Context, filter dto.FilterSlot) (*int64, error)
 
-	List(ctx context.Context, filter dto.FilterMovie) ([]model.MovieModel, error)
+	List(ctx context.Context, filter dto.FilterSlot) ([]model.SlotModel, error)
 
-	Insert(ctx context.Context, data *model.MovieModel) error
+	Insert(ctx context.Context, data *model.SlotModel) error
 }
 
-type movieStorage struct {
+type slotStorage struct {
 	commonStorage
 }
 
-func NewMovieStorage(cfg config.DatabaseConfig, db *gorm.DB) IMovieStorage {
-	return movieStorage{
+func NewSlotStorage(cfg config.DatabaseConfig, db *gorm.DB) ISlotStorage {
+	return slotStorage{
 		commonStorage: commonStorage{
 			db:       db,
 			configDb: cfg,
@@ -30,20 +30,20 @@ func NewMovieStorage(cfg config.DatabaseConfig, db *gorm.DB) IMovieStorage {
 	}
 }
 
-func (u movieStorage) tableName() string {
-	return model.MovieModel{}.TableName()
+func (u slotStorage) tableName() string {
+	return model.SlotModel{}.TableName()
 }
 
-func (s movieStorage) BuildQuery(filter dto.FilterMovie) *gorm.DB {
+func (s slotStorage) BuildQuery(filter dto.FilterSlot) *gorm.DB {
 	query := s.table(s.tableName())
-	if filter.ID != "" {
-		query = query.Where("id = ?", filter.ID)
+	if filter.MovieID != "" {
+		query = query.Where("movie_id = ?", filter.MovieID)
 	}
 	return query
 }
 
-// Count implements IMovieStorage.
-func (u movieStorage) Count(ctx context.Context, filter dto.FilterMovie) (*int64, error) {
+// Count implements ISlotStorage.
+func (u slotStorage) Count(ctx context.Context, filter dto.FilterSlot) (*int64, error) {
 	return u.CCount(ctx, CommonStorageParams{
 		TableName:    u.tableName(),
 		Filter:       filter,
@@ -53,8 +53,8 @@ func (u movieStorage) Count(ctx context.Context, filter dto.FilterMovie) (*int64
 }
 
 // FindOne implements IPostStorage.
-func (u movieStorage) FindOne(ctx context.Context, filter dto.FilterMovie) (model.MovieModel, error) {
-	var result model.MovieModel
+func (u slotStorage) FindOne(ctx context.Context, filter dto.FilterSlot) (model.SlotModel, error) {
+	var result model.SlotModel
 	err := u.CFindOne(ctx, CommonStorageParams{
 		TableName:    u.tableName(),
 		Filter:       filter,
@@ -66,8 +66,8 @@ func (u movieStorage) FindOne(ctx context.Context, filter dto.FilterMovie) (mode
 }
 
 // List implements IPostStorage.
-func (u movieStorage) List(ctx context.Context, filter dto.FilterMovie) ([]model.MovieModel, error) {
-	var result []model.MovieModel // khoi tao cho nay ra mang rong
+func (u slotStorage) List(ctx context.Context, filter dto.FilterSlot) ([]model.SlotModel, error) {
+	var result []model.SlotModel // khoi tao cho nay ra mang rong
 	err := u.CList(ctx, CommonStorageParams{
 		TableName:    u.tableName(),
 		Filter:       filter,
@@ -78,7 +78,7 @@ func (u movieStorage) List(ctx context.Context, filter dto.FilterMovie) ([]model
 	return result, err
 }
 
-func (u movieStorage) Insert(ctx context.Context, data *model.MovieModel) error {
+func (u slotStorage) Insert(ctx context.Context, data *model.SlotModel) error {
 	return u.CInsert(ctx, CommonStorageParams{
 		TableName: u.tableName(),
 		Data:      data,
@@ -86,7 +86,7 @@ func (u movieStorage) Insert(ctx context.Context, data *model.MovieModel) error 
 }
 
 // UpdateMany implements IPostStorage.
-func (u movieStorage) UpdateMany(ctx context.Context, filter dto.FilterMovie, data model.MovieModel) error {
+func (u slotStorage) UpdateMany(ctx context.Context, filter dto.FilterSlot, data model.SlotModel) error {
 	return u.CUpdateMany(ctx, CommonStorageParams{
 		TableName: u.tableName(),
 		Data:      data,

@@ -29,7 +29,7 @@ func main() {
 
 	postgresqlDB, err := database.NewPostgresqlDatabase(ctx, cnf.Database)
 	if err != nil {
-		logger.Panic(ctx, err, "init database error")
+		logger.Panic(ctx, err, "init postgresql database error")
 	}
 	redisClient, err := cache.NewRedisClient(ctx, cnf.Redis)
 	if err != nil {
