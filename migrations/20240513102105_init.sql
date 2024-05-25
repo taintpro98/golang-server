@@ -62,15 +62,20 @@ create table public.orders (
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-create table public.order_seats (
+create table public.slot_seats(
+    -- reservation management table
     id uuid DEFAULT uuid_generate_v4() primary key,
-    order_id varchar(30) not null,
     seat_id uuid not null,
-    total_pay float not null,
+    slot_id uuid not null,
+    order_id null,
+    total_pay float null,
+    "status" varchar not null,
     "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE UNIQUE INDEX slot_seats_slot_id_seat_id_u_idx ON public.slot_seats(slot_id, seat_id);
 
 CREATE INDEX orders_user_id_idx ON public.orders (user_id);
 
