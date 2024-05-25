@@ -2,6 +2,7 @@ package dto
 
 import (
 	"golang-server/module/api/model"
+	"golang-server/pkg/constants"
 	"time"
 )
 
@@ -10,8 +11,17 @@ type GetMovieSlotInfoRequest struct {
 	MovieID string `form:"movie_id"`
 }
 
+type SeatDetailData struct {
+	SeatID   string               `json:"seat_id"`
+	SeatCode string               `json:"seat_code"`
+	Status   constants.SeatStatus `json:"status"`
+}
+
 type GetMovieSlotInfoResponse struct {
-	Slots []model.SlotModel `json:"slots"`
+	SlotID  string           `json:"slot_id"`
+	RoomID  int64            `json:"room_id"`
+	MovieID string           `json:"movie_id"`
+	Seats   []SeatDetailData `json:"seats"`
 }
 
 type AdminCreateSlotRequest struct {
@@ -44,6 +54,7 @@ type AdminCreateSlotResponse struct {
 type FilterSlot struct {
 	CommonFilter CommonFilter
 	MovieID      string
+	ID           string
 }
 
 type ReserveSeatsRequest struct {

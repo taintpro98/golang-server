@@ -7,12 +7,8 @@ import (
 )
 
 func (t *Transport) GetMovieSlotInfo(ctx *gin.Context) {
-	var data dto.GetMovieSlotInfoRequest
-	if err := ctx.ShouldBindQuery(&data); err != nil {
-		dto.HandleResponse(ctx, nil, err)
-		return
-	}
-	result, err := t.biz.GetMovieSlotInfo(ctx, data)
+	slotID := ctx.Param("slotID")
+	result, err := t.biz.GetMovieSlotInfo(ctx, slotID)
 	dto.HandleResponse(ctx, result, err)
 }
 

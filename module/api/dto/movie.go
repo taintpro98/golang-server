@@ -23,3 +23,7 @@ type AdminCreateMovieRequest struct {
 type AdminCreateMovieResponse struct {
 	MovieID string `json:"movie_id"`
 }
+
+type ListMovieSlotsResponse struct {
+	Slots []model.SlotModel `json:"slots"`
+}

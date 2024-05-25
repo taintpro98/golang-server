@@ -12,6 +12,8 @@ import (
 type ISlotStorage interface {
 	Count(ctx context.Context, filter dto.FilterSlot) (*int64, error)
 
+	FindOne(ctx context.Context, filter dto.FilterSlot) (model.SlotModel, error)
+
 	List(ctx context.Context, filter dto.FilterSlot) ([]model.SlotModel, error)
 
 	Insert(ctx context.Context, data *model.SlotModel) error
@@ -38,6 +40,9 @@ func (s slotStorage) BuildQuery(filter dto.FilterSlot) *gorm.DB {
 	query := s.table(s.tableName())
 	if filter.MovieID != "" {
 		query = query.Where("movie_id = ?", filter.MovieID)
+	}
+	if filter.ID != "" {
+		query = query.Where("id = ?", filter.ID)
 	}
 	return query
 }

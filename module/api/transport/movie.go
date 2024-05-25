@@ -24,3 +24,10 @@ func (t Transport) ListMovies(ctx *gin.Context) {
 		})
 	}
 }
+
+func (t Transport) ListMovieSlots(ctx *gin.Context) {
+	movieID := ctx.Param("movieID")
+	//TODO: check valid uuid
+	results, err := t.biz.ListMovieSlots(ctx, movieID)
+	dto.HandleResponse(ctx, results, err)
+}

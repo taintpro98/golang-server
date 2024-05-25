@@ -3,18 +3,24 @@ package business
 import (
 	"context"
 	"golang-server/module/api/dto"
+	"golang-server/pkg/e"
 )
 
 // GetMovieSlotInfo implements IBiz.
-func (b biz) GetMovieSlotInfo(ctx context.Context, data dto.GetMovieSlotInfoRequest) (dto.GetMovieSlotInfoResponse, error) {
+func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieSlotInfoResponse, error) {
 	var response dto.GetMovieSlotInfoResponse
-	slots, err := b.slotStorage.List(ctx, dto.FilterSlot{
-		MovieID: data.MovieID,
+	slot, err := b.slotStorage.FindOne(ctx, dto.FilterSlot{
+		ID: slotID,
 	})
 	if err != nil {
 		return response, err
 	}
-	response.Slots = slots
+	if slot.ID == "" {
+		return response, e.ErrDataNotFound("slot")
+	}
+	response.MovieID = slot.MovieID
+	response.RoomID = slot.RoomID
+	response.SlotID = slotID
 	return response, nil
 }
 

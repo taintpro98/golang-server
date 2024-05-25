@@ -31,13 +31,14 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 
 		slotApi := publicApi.Group("/slots")
 		{
-			slotApi.GET("", trpt.GetMovieSlotInfo)
+			slotApi.GET("/:slotID", trpt.GetMovieSlotInfo)
 			slotApi.POST("", trpt.ReserveSeats)
 		}
 
 		movieApi := publicApi.Group("/movies")
 		{
 			movieApi.GET("", trpt.ListMovies)
+			movieApi.GET("/:movieID/slots", trpt.ListMovieSlots)
 		}
 	}
 

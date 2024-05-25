@@ -3,8 +3,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- dong nay de tu dong sinh uuid
-DROP TABLE IF EXISTS users;
-
+DROP TABLE IF EXISTS public.users;
 create table public.users (
     id uuid DEFAULT uuid_generate_v4() primary key,
     phone varchar not null,
@@ -14,14 +13,16 @@ create table public.users (
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.rooms;
 create table public.rooms(
     id bigserial primary key,
-    name varchar not null,
+    "name" varchar not null,
     "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.seats;
 create table public.seats(
     id uuid DEFAULT uuid_generate_v4() primary key,
     seat_code varchar not null,
@@ -32,6 +33,7 @@ create table public.seats(
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.movies;
 create table public.movies(
     id uuid DEFAULT uuid_generate_v4() primary key,
     title varchar not null,
@@ -42,6 +44,7 @@ create table public.movies(
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.slots;
 create table public.slots(
     id uuid DEFAULT uuid_generate_v4() primary key,
     room_id integer not null,
@@ -53,6 +56,7 @@ create table public.slots(
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.orders;
 create table public.orders (
     id varchar(30) not null primary key,
     user_id uuid not null,
@@ -62,12 +66,12 @@ create table public.orders (
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.slot_seats;
 create table public.slot_seats(
-    -- reservation management table
     id uuid DEFAULT uuid_generate_v4() primary key,
     seat_id uuid not null,
     slot_id uuid not null,
-    order_id null,
+    order_id varchar null,
     total_pay float null,
     "status" varchar not null,
     "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -82,8 +86,6 @@ CREATE INDEX orders_user_id_idx ON public.orders (user_id);
 CREATE INDEX orders_slot_id_idx ON public.orders (slot_id);
 
 CREATE UNIQUE INDEX seats_seat_code_room_id_u_idx ON public.seats (seat_code, room_id);
-
-CREATE UNIQUE INDEX order_seats_order_id_seat_id_u_idx ON public.order_seats (order_id, seat_id);
 
 -- +goose StatementEnd
 -- +goose Down

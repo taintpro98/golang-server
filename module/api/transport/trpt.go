@@ -3,7 +3,6 @@ package transport
 import (
 	"golang-server/module/api/business"
 	"golang-server/module/api/dto"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,9 +26,5 @@ func (t *Transport) Register(ctx *gin.Context) {
 		return
 	}
 	result, err := t.biz.Register(ctx, data)
-	if err != nil {
-
-	} else {
-		ctx.JSON(http.StatusCreated, result)
-	}
+	dto.HandleResponse(ctx, result, err)
 }

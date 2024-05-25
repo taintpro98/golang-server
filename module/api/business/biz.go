@@ -13,11 +13,12 @@ type IBiz interface {
 	Register(ctx context.Context, data dto.CreateUserRequest) (*model.UserModel, error)
 
 	//slots
-	GetMovieSlotInfo(ctx context.Context, data dto.GetMovieSlotInfoRequest) (dto.GetMovieSlotInfoResponse, error)
+	GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieSlotInfoResponse, error)
 	ReserveSeats(ctx context.Context, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error)
 
 	// movies
 	ListMovies(ctx context.Context, data dto.ListMoviesRequest) (dto.ListMoviesResponse, *int64, error)
+	ListMovieSlots(ctx context.Context, movieID string) (dto.ListMovieSlotsResponse, error)
 
 	// admin
 	// movies
