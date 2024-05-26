@@ -21,6 +21,19 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 	response.MovieID = slot.MovieID
 	response.RoomID = slot.RoomID
 	response.SlotID = slotID
+
+	allSeats, _ := b.seatStorage.List(ctx, dto.FilterSeat{
+		RoomID: slot.RoomID,
+		CommonFilter: dto.CommonFilter{
+			Sort: "seat_order",
+		},
+	})
+	for _, item := range allSeats { // can xem la co for duoc mang nil khong ??? - vo tu
+		response.Seats = append(response.Seats, dto.SeatDetailData{
+			SeatID:   item.ID,
+			SeatCode: item.SeatCode,
+		})
+	}
 	return response, nil
 }
 

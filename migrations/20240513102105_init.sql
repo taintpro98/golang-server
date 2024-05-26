@@ -28,6 +28,7 @@ create table public.seats(
     seat_code varchar not null,
     room_id integer not null,
     seat_type varchar not null,
+    seat_order integer not null,
     "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP

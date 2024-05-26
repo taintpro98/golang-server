@@ -21,6 +21,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		storage.NewNotificationStorage(bot),
 		storage.NewSlotStorage(cnf.Database, db),
 		storage.NewRoomStorage(cnf.Database, db),
+		storage.NewSeatStorage(cnf.Database, db),
 	)
 	trpt := transport.NewTransport(biz)
 

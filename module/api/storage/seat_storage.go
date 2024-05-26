@@ -1,0 +1,52 @@
+package storage
+
+import (
+	"context"
+	"golang-server/config"
+	"golang-server/module/api/dto"
+	"golang-server/module/api/model"
+
+	"gorm.io/gorm"
+)
+
+type ISeatStorage interface {
+	List(ctx context.Context, filter dto.FilterSeat) ([]model.SeatModel, error)
+}
+
+type seatStorage struct {
+	commonStorage
+}
+
+func NewSeatStorage(cfg config.DatabaseConfig, db *gorm.DB) ISeatStorage {
+	return seatStorage{
+		commonStorage: commonStorage{
+			configDb: cfg,
+			db:       db,
+		},
+	}
+}
+
+func (s seatStorage) tableName() string {
+	return model.SeatModel{}.TableName()
+}
+
+func (s seatStorage) BuildQuery(filter dto.FilterSeat) *gorm.DB {
+	query := s.table(s.tableName())
+	if filter.RoomID != 0 {
+		query = query.Where("room_id = ?", filter.RoomID)
+	}
+	return query
+}
+
+// List implements ISeatStorage.
+func (u seatStorage) List(ctx context.Context, filter dto.FilterSeat) ([]model.SeatModel, error) {
+	var result []model.SeatModel // khoi tao cho nay ra mang rong
+	err := u.CList(ctx, CommonStorageParams{
+		TableName:    u.tableName(),
+		Filter:       filter,
+		CommonFilter: filter.CommonFilter,
+		Query:        u.BuildQuery(filter),
+		Data:         &result,
+	})
+	return result, err
+}

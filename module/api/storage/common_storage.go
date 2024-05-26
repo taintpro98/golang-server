@@ -76,12 +76,12 @@ func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) err
 		param.Query = param.Query.Offset(*param.CommonFilter.Offset)
 	}
 	if param.CommonFilter.Sort != "" {
-		param.Query = param.Query.Order(param.CommonFilter.Sort)
+		param.Query = param.Query.Order(param.CommonFilter.Sort) // age desc hoac age asc hoac age
 	}
 	if len(param.CommonFilter.Select) > 0 {
 		param.Query = param.Query.Select(param.CommonFilter.Select)
 	}
-	tx := param.Query.Find(param.Data) // day la contro vao bien ket qua
+	tx := param.Query.Find(param.Data) // day la con tro vao bien ket qua
 	if tx.Error != nil {
 		logger.Error(
 			ctx,
@@ -113,7 +113,6 @@ func (s commonStorage) CUpdateMany(ctx context.Context, param CommonStorageParam
 	s.log(ctx, "CUpdateMany", param)
 
 	tx := param.Query.Updates(param.Data)
-
 	if tx.Error != nil {
 		logger.Error(ctx, tx.Error, fmt.Sprintf("Failed to update many %s", param.TableName))
 	}
