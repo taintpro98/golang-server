@@ -1,6 +1,6 @@
 package dto
 
-import "golang-server/module/api/model"
+import "golang-server/module/core/model"
 
 type ListMoviesRequest struct {
 	Paginate

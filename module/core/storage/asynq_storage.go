@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"golang-server/app/worker/task"
 	"golang-server/config"
-	"golang-server/module/api/model"
+	"golang-server/module/core/model"
 	"golang-server/pkg/logger"
 
 	"github.com/hibiken/asynq"

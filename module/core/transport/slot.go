@@ -1,7 +1,7 @@
 package transport
 
 import (
-	"golang-server/module/api/dto"
+	"golang-server/module/core/dto"
 
 	"github.com/gin-gonic/gin"
 )

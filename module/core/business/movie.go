@@ -2,7 +2,7 @@ package business
 
 import (
 	"context"
-	"golang-server/module/api/dto"
+	"golang-server/module/core/dto"
 )
 
 func (b biz) ListMovies(ctx context.Context, data dto.ListMoviesRequest) (dto.ListMoviesResponse, *int64, error) {

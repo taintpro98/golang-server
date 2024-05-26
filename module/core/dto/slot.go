@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"golang-server/module/api/model"
+	"golang-server/module/core/model"
 	"golang-server/pkg/constants"
 	"time"
 )

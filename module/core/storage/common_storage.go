@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"golang-server/config"
-	"golang-server/module/api/dto"
+	"golang-server/module/core/dto"
 	"golang-server/pkg/logger"
 
 	"gorm.io/gorm"

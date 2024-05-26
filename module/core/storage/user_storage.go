@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"golang-server/config"
-	"golang-server/module/api/model"
+	"golang-server/module/core/model"
 
 	"gorm.io/gorm"
 )

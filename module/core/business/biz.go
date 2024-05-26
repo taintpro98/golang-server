@@ -2,9 +2,9 @@ package business
 
 import (
 	"context"
-	"golang-server/module/api/dto"
-	"golang-server/module/api/model"
-	"golang-server/module/api/storage"
+	"golang-server/module/core/dto"
+	"golang-server/module/core/model"
+	"golang-server/module/core/storage"
 )
 
 type IBiz interface {

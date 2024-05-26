@@ -1,8 +1,9 @@
 package route
 
 import (
+	trpt "golang-server/module/core/transport"
+
 	"github.com/gin-gonic/gin"
-	trpt "golang-server/module/api/transport"
 )
 
 func RegisterHealthCheckRoute(e *gin.Engine) {

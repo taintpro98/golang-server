@@ -2,9 +2,9 @@ package route
 
 import (
 	"golang-server/config"
-	"golang-server/module/api/business"
-	"golang-server/module/api/storage"
-	"golang-server/module/api/transport"
+	"golang-server/module/core/business"
+	"golang-server/module/core/storage"
+	"golang-server/module/core/transport"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/telegram"
 

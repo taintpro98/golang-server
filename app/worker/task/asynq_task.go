@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang-server/config"
-	"golang-server/module/api/model"
+	"golang-server/module/core/model"
 	"golang-server/pkg/logger"
 	"time"
 
