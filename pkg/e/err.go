@@ -23,6 +23,11 @@ var (
 		Msg:            "Unauthorized",
 		Language:       "unauthorized",
 	}
+	ErrTimeout = CustomErr{
+		HttpStatusCode: http.StatusRequestTimeout,
+		Code:           http.StatusRequestTimeout,
+		Msg:            "Request timeout",
+	}
 )
 
 func ErrDataNotFound(tableName string) CustomErr {

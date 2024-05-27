@@ -2,6 +2,8 @@ package logger
 
 import (
 	"context"
+	"net/http"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -25,4 +27,14 @@ func Error(ctx context.Context, err error, msg string) {
 
 func Panic(ctx context.Context, err error, msg string, fields ...LogField) {
 	log.Panic().Stack().Err(err).Msg(msg)
+}
+
+func LogInfoRequest(ctx context.Context,
+	end time.Duration,
+	req http.Request,
+	res http.Response,
+	body []byte,
+	err error,
+) {
+
 }
