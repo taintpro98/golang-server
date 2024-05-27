@@ -3,7 +3,8 @@ package constants
 type SeatStatus string
 
 const (
-	ReservingSeat SeatStatus = "reserving"
+	EmptySeat     SeatStatus = "empty"
+	ReservingSeat SeatStatus = "reserving" // trang thai nay chi co trong redis, 2 trang thai con lai luu trong db
 	ReservedSeat  SeatStatus = "reserved"
 )
 

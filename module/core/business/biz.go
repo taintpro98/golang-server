@@ -38,6 +38,7 @@ type biz struct {
 	slotStorage         storage.ISlotStorage
 	roomStorage         storage.IRoomStorage
 	seatStorage         storage.ISeatStorage
+	slotSeatStorage     storage.ISlotSeatStorage
 }
 
 func NewBiz(
@@ -47,6 +48,7 @@ func NewBiz(
 	slotStorage storage.ISlotStorage,
 	roomStorage storage.IRoomStorage,
 	seatStorage storage.ISeatStorage,
+	slotSeatStorage storage.ISlotSeatStorage,
 ) IBiz {
 	return biz{
 		userStorage:         userStorage,
@@ -55,5 +57,6 @@ func NewBiz(
 		notificationStorage: notificationStorage,
 		roomStorage:         roomStorage,
 		seatStorage:         seatStorage,
+		slotSeatStorage:     slotSeatStorage,
 	}
 }

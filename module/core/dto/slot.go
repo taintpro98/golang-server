@@ -62,3 +62,8 @@ type ReserveSeatsRequest struct {
 
 type ReserveSeatsResponse struct {
 }
+
+type FilterSlotSeat struct {
+	CommonFilter CommonFilter
+	SlotID       string
+}

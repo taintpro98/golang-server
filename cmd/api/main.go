@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"golang-server/config"
 	"golang-server/middleware"
 	"golang-server/pkg/cache"
@@ -59,9 +60,9 @@ func main() {
 	}
 
 	go func() {
-		logger.Info(ctx, "Running API...")
+		logger.Info(ctx, fmt.Sprintf("Running API on port %s...", cnf.AppInfo.ApiPort))
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Info(ctx, "Run app error")
+			logger.Error(ctx, err, "Run app error")
 		}
 	}()
 	// Đợi tín hiệu tắt từ hệ thống hoặc từ người dùng

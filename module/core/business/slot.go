@@ -3,6 +3,7 @@ package business
 import (
 	"context"
 	"golang-server/module/core/dto"
+	"golang-server/pkg/constants"
 	"golang-server/pkg/e"
 )
 
@@ -28,11 +29,26 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 			Sort: "seat_order",
 		},
 	})
+
+	reservedSeats, _ := b.slotSeatStorage.List(ctx, dto.FilterSlotSeat{
+		SlotID: slotID,
+	})
+	reservedMap := make(map[string]constants.SeatStatus)
+	for _, item := range reservedSeats {
+		reservedMap[item.SeatID] = item.Status
+	}
+
 	for _, item := range allSeats { // can xem la co for duoc mang nil khong ??? - vo tu
-		response.Seats = append(response.Seats, dto.SeatDetailData{
+		seat := dto.SeatDetailData{
 			SeatID:   item.ID,
 			SeatCode: item.SeatCode,
-		})
+		}
+		if val, ok := reservedMap[item.ID]; ok && val != "" {
+			seat.Status = constants.ReservedSeat
+		} else {
+			seat.Status = constants.EmptySeat
+		}
+		response.Seats = append(response.Seats, seat)
 	}
 	return response, nil
 }
