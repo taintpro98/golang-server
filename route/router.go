@@ -16,6 +16,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 	v1Api := e.Group("/v1")
 
 	biz := business.NewBiz(
+		redisClient,
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewMovieStorage(cnf.Database, db),
 		storage.NewNotificationStorage(bot),
@@ -34,7 +35,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		slotApi := publicApi.Group("/slots")
 		{
 			slotApi.GET("/:slotID", trpt.GetMovieSlotInfo)
-			slotApi.POST("", trpt.ReserveSeats)
+			slotApi.POST("/:slotID", trpt.ReserveSeats)
 		}
 
 		movieApi := publicApi.Group("/movies")

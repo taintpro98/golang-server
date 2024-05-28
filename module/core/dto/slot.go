@@ -58,9 +58,12 @@ type FilterSlot struct {
 }
 
 type ReserveSeatsRequest struct {
+	SeatID string `json:"seat_id" binding:"required"`
+	UserID string
 }
 
 type ReserveSeatsResponse struct {
+	SeatID string `json:"seat_id"`
 }
 
 type FilterSlotSeat struct {

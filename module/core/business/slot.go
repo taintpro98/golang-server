@@ -2,9 +2,14 @@ package business
 
 import (
 	"context"
+	"fmt"
 	"golang-server/module/core/dto"
 	"golang-server/pkg/constants"
 	"golang-server/pkg/e"
+	"golang-server/pkg/logger"
+	"golang-server/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 // GetMovieSlotInfo implements IBiz.
@@ -38,6 +43,13 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 		reservedMap[item.SeatID] = item.Status
 	}
 
+	var reservingSeatsMap map[string]string // map seat id -> user id
+	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
+	err = b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
+	if err != nil {
+		logger.Info(ctx, "get slot seats map key error")
+	}
+
 	for _, item := range allSeats { // can xem la co for duoc mang nil khong ??? - vo tu
 		seat := dto.SeatDetailData{
 			SeatID:   item.ID,
@@ -45,6 +57,8 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 		}
 		if val, ok := reservedMap[item.ID]; ok && val != "" {
 			seat.Status = constants.ReservedSeat
+		} else if val, ok := reservingSeatsMap[item.ID]; ok && utils.IsValidUUID(val) {
+			seat.Status = constants.ReservingSeat
 		} else {
 			seat.Status = constants.EmptySeat
 		}
@@ -54,7 +68,38 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 }
 
 // ReserveSeats implements IBiz.
-func (b biz) ReserveSeats(ctx context.Context, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error) {
-	var response dto.ReserveSeatsResponse
-	return response, nil
+func (b biz) ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error) {
+	response := dto.ReserveSeatsResponse{
+		SeatID: data.SeatID,
+	}
+	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
+
+	// check cac seat reserving
+	reservingSeatsMap := make(map[string]string) // map seat id -> user id
+	err := b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
+	if err == nil { // lay duoc thong tin slot trong redis
+		if val, ok := reservingSeatsMap[data.SeatID]; ok && utils.IsValidUUID(val) { // neu ma seat nay co nguoi dat roi
+			return response, e.ErrSeatReserved
+		}
+	}
+
+	// check reserved seats
+	reservedSeats, err := b.slotSeatStorage.List(ctx, dto.FilterSlotSeat{
+		SlotID: slotID,
+	})
+	if err != nil {
+		return response, err
+	}
+	for _, item := range reservedSeats {
+		if item.SeatID == data.SeatID {
+			return response, e.ErrSeatReserved
+		}
+	}
+
+	reservingSeatsMap[data.SeatID] = data.UserID // cho user dat cho
+	err = b.redisClient.Set(ctx, slotKey, reservingSeatsMap, 1200)
+	if err != nil {
+		logger.Error(ctx, err, "set ReserveSeats redis err")
+	}
+	return response, err
 }

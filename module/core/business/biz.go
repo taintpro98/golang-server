@@ -5,6 +5,9 @@ import (
 	"golang-server/module/core/dto"
 	"golang-server/module/core/model"
 	"golang-server/module/core/storage"
+	"golang-server/pkg/cache"
+
+	"github.com/gin-gonic/gin"
 )
 
 type IBiz interface {
@@ -14,7 +17,7 @@ type IBiz interface {
 
 	//slots
 	GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieSlotInfoResponse, error)
-	ReserveSeats(ctx context.Context, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error)
+	ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error)
 
 	// movies
 	ListMovies(ctx context.Context, data dto.ListMoviesRequest) (dto.ListMoviesResponse, *int64, error)
@@ -32,6 +35,7 @@ type IBiz interface {
 }
 
 type biz struct {
+	redisClient         cache.IRedisClient
 	userStorage         storage.IUserStorage
 	movieStorage        storage.IMovieStorage
 	notificationStorage storage.INotificationStorage
@@ -42,6 +46,7 @@ type biz struct {
 }
 
 func NewBiz(
+	redisClient cache.IRedisClient,
 	userStorage storage.IUserStorage,
 	movieStorage storage.IMovieStorage,
 	notificationStorage storage.INotificationStorage,
@@ -51,6 +56,7 @@ func NewBiz(
 	slotSeatStorage storage.ISlotSeatStorage,
 ) IBiz {
 	return biz{
+		redisClient:         redisClient,
 		userStorage:         userStorage,
 		movieStorage:        movieStorage,
 		slotStorage:         slotStorage,
