@@ -93,7 +93,11 @@ func (u roomStorage) ListAll(ctx context.Context) ([]model.RoomModel, error) { /
 	if err == nil {
 		return result, nil
 	}
-	result, err = u.List(ctx, dto.FilterRoom{})
+	result, err = u.List(ctx, dto.FilterRoom{
+		CommonFilter: dto.CommonFilter{
+			Select: []string{"id", "name"},
+		},
+	})
 	if err != nil {
 		return result, err
 	}

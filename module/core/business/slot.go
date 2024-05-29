@@ -69,12 +69,20 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 
 // ReserveSeats implements IBiz.
 func (b biz) ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error) {
+	// cac ghe trong phong, ghe da duoc dat, get dang duoc dat
 	response := dto.ReserveSeatsResponse{
 		SeatID: data.SeatID,
 	}
-	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
+
+	// slotInfo, err := b.slotStorage.FindOne(ctx, dto.FilterSlot{ // get slot info
+	// 	ID: slotID,
+	// })
+	// if err != nil {
+	// 	return response, err
+	// }
 
 	// check cac seat reserving
+	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
 	reservingSeatsMap := make(map[string]string) // map seat id -> user id
 	err := b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
 	if err == nil { // lay duoc thong tin slot trong redis

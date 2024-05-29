@@ -57,6 +57,12 @@ func (s commonStorage) CFindOne(ctx context.Context, param CommonStorageParams) 
 	if len(param.CommonFilter.Select) > 0 {
 		param.Query = param.Query.Select(param.CommonFilter.Select)
 	}
+	if len(param.CommonFilter.Preloads) > 0 {
+		for _, item := range param.CommonFilter.Preloads {
+			param.Query = param.Query.Preload(item)
+		}
+	}
+
 	tx := param.Query.First(param.Data)
 	if tx.Error != nil && !errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		logger.Error(ctx, tx.Error, fmt.Sprintf("find one %s error", param.TableName))
@@ -78,6 +84,12 @@ func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) err
 	if len(param.CommonFilter.Select) > 0 {
 		param.Query = param.Query.Select(param.CommonFilter.Select)
 	}
+	if len(param.CommonFilter.Preloads) > 0 { // khong khuyen khich dung preloads trong list
+		for _, item := range param.CommonFilter.Preloads {
+			param.Query = param.Query.Preload(item)
+		}
+	}
+
 	tx := param.Query.Find(param.Data) // day la con tro vao bien ket qua
 	if tx.Error != nil && !errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		logger.Error(

@@ -10,6 +10,8 @@ type SlotModel struct {
 	EndTime   *time.Time `json:"end_time,omitempty" gorm:"column:end_time"`
 	CreatedAt *time.Time `json:"created_at,omitempty" gorm:"column:created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty" gorm:"column:updated_at"`
+
+	Room *RoomModel `json:"room,omitempty" gorm:"foreignKey:RoomID;reference:ID"`
 }
 
 func (SlotModel) TableName() string {

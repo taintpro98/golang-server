@@ -12,6 +12,8 @@ type RoomModel struct {
 	Name      string     `json:"name,omitempty" gorm:"column:name"`
 	CreatedAt *time.Time `json:"created_at,omitempty" gorm:"column:created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty" gorm:"column:updated_at"`
+
+	Seats []SeatModel `json:"seats,omitempty" gorm:"foreignKey:RoomID;references:ID"`
 }
 
 func (RoomModel) TableName() string {
