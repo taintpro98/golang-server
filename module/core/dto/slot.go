@@ -64,6 +64,7 @@ type ReserveSeatsRequest struct {
 
 type ReserveSeatsResponse struct {
 	SeatID string `json:"seat_id"`
+	SlotID string `json:"slot_id"`
 }
 
 type FilterSlotSeat struct {

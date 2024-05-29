@@ -17,3 +17,5 @@ docker-compose.yml
 app.env
 secrets
 cmd/test.go
+
+./docker/redis-data/dump.rdb

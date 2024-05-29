@@ -2,9 +2,13 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"golang-server/config"
 	"golang-server/module/core/dto"
 	"golang-server/module/core/model"
+	"golang-server/pkg/cache"
+	"golang-server/pkg/constants"
+	"golang-server/pkg/logger"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +18,8 @@ type ISlotStorage interface {
 
 	FindOne(ctx context.Context, filter dto.FilterSlot) (model.SlotModel, error)
 
+	FindByID(ctx context.Context, id string) (model.SlotModel, error) // cache, full info
+
 	List(ctx context.Context, filter dto.FilterSlot) ([]model.SlotModel, error)
 
 	Insert(ctx context.Context, data *model.SlotModel) error
@@ -21,14 +27,16 @@ type ISlotStorage interface {
 
 type slotStorage struct {
 	commonStorage
+	redisClient cache.IRedisClient
 }
 
-func NewSlotStorage(cfg config.DatabaseConfig, db *gorm.DB) ISlotStorage {
+func NewSlotStorage(cfg config.DatabaseConfig, db *gorm.DB, redisClient cache.IRedisClient) ISlotStorage {
 	return slotStorage{
 		commonStorage: commonStorage{
 			db:       db,
 			configDb: cfg,
 		},
+		redisClient: redisClient,
 	}
 }
 
@@ -68,6 +76,30 @@ func (u slotStorage) FindOne(ctx context.Context, filter dto.FilterSlot) (model.
 		Data:         &result,
 	})
 	return result, err
+}
+
+// FindByID implements ISlotStorage.
+func (u slotStorage) FindByID(ctx context.Context, id string) (model.SlotModel, error) {
+	var result model.SlotModel
+	key := fmt.Sprintf("%s:%s", constants.FindByIDSlotKey, id)
+	err := u.redisClient.Get(ctx, key, &result)
+	if err == nil {
+		return result, nil
+	}
+	result, err = u.FindOne(ctx, dto.FilterSlot{
+		ID: id,
+		CommonFilter: dto.CommonFilter{
+			Preloads: []string{"Room", "Room.Seats"},
+		},
+	})
+	if err != nil {
+		return result, err
+	}
+	err = u.redisClient.Set(ctx, key, result, 1800)
+	if err != nil {
+		logger.Error(ctx, err, "save slot to redis error")
+	}
+	return result, nil
 }
 
 // List implements IPostStorage.

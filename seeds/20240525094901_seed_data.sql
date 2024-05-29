@@ -109,21 +109,35 @@ VALUES
     '2024-05-25 17:27:31.666'
   );
 
-insert into public.seats (
-  room_id, seat_code, seat_type, seat_order
-) values (
-  1, 'A1', 'normal', 1
-), (
-  1, 'A2', 'normal', 2
-), (
-  1, 'A3', 'normal', 3
-), (
-  1, 'B1', 'vip', 4
-), (
-  1, 'B2', 'vip', 5
-), (
-  1, 'B3', 'vip', 6
-);
+insert into
+  public.seats (room_id, seat_code, seat_type, seat_order)
+values
+  (1, 'A1', 'normal', 1),
+  (1, 'A2', 'normal', 2),
+  (1, 'A3', 'normal', 3),
+  (1, 'B1', 'vip', 4),
+  (1, 'B2', 'vip', 5),
+  (1, 'B3', 'vip', 6);
+
+insert into
+  public.users (id, phone, email)
+values
+  (
+    '566b2ae2-5837-4b20-a030-b6825308c288',
+    '012345678',
+    'alice@gmail.com'
+  ),
+  (
+    '73122f85-50db-4f1d-a618-672f0609fe61',
+    '023456781',
+    'bob@gmail.com'
+  ),
+  (
+    '719565e7-4afc-4f21-9fbf-836053662dde',
+    '034567812',
+    'clover@gmail.com'
+  );
+
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

@@ -20,10 +20,10 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewMovieStorage(cnf.Database, db),
 		storage.NewNotificationStorage(bot),
-		storage.NewSlotStorage(cnf.Database, db),
+		storage.NewSlotStorage(cnf.Database, db, redisClient),
 		storage.NewRoomStorage(cnf.Database, db, redisClient),
 		storage.NewSeatStorage(cnf.Database, db),
-		storage.NewSlotSeatStorage(cnf.Database, db),
+		storage.NewSlotSeatStorage(cnf.Database, db, redisClient),
 	)
 	trpt := transport.NewTransport(biz)
 

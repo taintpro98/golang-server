@@ -17,6 +17,9 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 	var response dto.GetMovieSlotInfoResponse
 	slot, err := b.slotStorage.FindOne(ctx, dto.FilterSlot{
 		ID: slotID,
+		CommonFilter: dto.CommonFilter{
+			Preloads: []string{"Room.Seats"},
+		},
 	})
 	if err != nil {
 		return response, err
@@ -27,13 +30,6 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 	response.MovieID = slot.MovieID
 	response.RoomID = slot.RoomID
 	response.SlotID = slotID
-
-	allSeats, _ := b.seatStorage.List(ctx, dto.FilterSeat{
-		RoomID: slot.RoomID,
-		CommonFilter: dto.CommonFilter{
-			Sort: "seat_order",
-		},
-	})
 
 	reservedSeats, _ := b.slotSeatStorage.List(ctx, dto.FilterSlotSeat{
 		SlotID: slotID,
@@ -50,7 +46,7 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 		logger.Info(ctx, "get slot seats map key error")
 	}
 
-	for _, item := range allSeats { // can xem la co for duoc mang nil khong ??? - vo tu
+	for _, item := range slot.Room.Seats { // can xem la co for duoc mang nil khong ??? - vo tu
 		seat := dto.SeatDetailData{
 			SeatID:   item.ID,
 			SeatCode: item.SeatCode,
@@ -72,42 +68,50 @@ func (b biz) ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeats
 	// cac ghe trong phong, ghe da duoc dat, get dang duoc dat
 	response := dto.ReserveSeatsResponse{
 		SeatID: data.SeatID,
+		SlotID: slotID,
 	}
 
-	// slotInfo, err := b.slotStorage.FindOne(ctx, dto.FilterSlot{ // get slot info
-	// 	ID: slotID,
-	// })
-	// if err != nil {
-	// 	return response, err
-	// }
-
-	// check cac seat reserving
-	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
-	reservingSeatsMap := make(map[string]string) // map seat id -> user id
-	err := b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
-	if err == nil { // lay duoc thong tin slot trong redis
-		if val, ok := reservingSeatsMap[data.SeatID]; ok && utils.IsValidUUID(val) { // neu ma seat nay co nguoi dat roi
-			return response, e.ErrSeatReserved
+	slotInfo, err := b.slotStorage.FindByID(ctx, slotID) // cho nay lay duoc het cac seats
+	if err != nil {
+		return response, err
+	}
+	isSeat := false
+	for _, item := range slotInfo.Room.Seats {
+		if item.ID == data.SeatID {
+			isSeat = true
 		}
+	}
+	if !isSeat {
+		return response, e.ErrSeatNotInRoomSlot
 	}
 
 	// check reserved seats
-	reservedSeats, err := b.slotSeatStorage.List(ctx, dto.FilterSlotSeat{
-		SlotID: slotID,
-	})
+	reservedSeats, err := b.slotSeatStorage.ListCacheSlot(ctx, slotID)
 	if err != nil {
 		return response, err
 	}
 	for _, item := range reservedSeats {
-		if item.SeatID == data.SeatID {
+		if item.SeatID == data.SeatID { // co nguoi dat cho nay roi
 			return response, e.ErrSeatReserved
 		}
 	}
 
+	// check reserving seats
+	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
+	reservingSeatsMap := make(map[string]string) // map seat id -> user id
+	err = b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
+	if err == nil { // lay duoc thong tin slot trong redis
+		if val, ok := reservingSeatsMap[data.SeatID]; ok && utils.IsValidUUID(val) { // neu ma seat nay dang co nguoi dat
+			return response, e.ErrSeatReserving
+		}
+	}
+
+	// thoa man het cac dieu kien roi
 	reservingSeatsMap[data.SeatID] = data.UserID // cho user dat cho
-	err = b.redisClient.Set(ctx, slotKey, reservingSeatsMap, 1200)
+	err = b.redisClient.Set(ctx, slotKey, reservingSeatsMap, 0)
 	if err != nil {
 		logger.Error(ctx, err, "set ReserveSeats redis err")
+		return response, e.ErrReserveSeat
 	}
-	return response, err
+	return response, nil
 }
