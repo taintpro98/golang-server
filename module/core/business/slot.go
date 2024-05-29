@@ -101,8 +101,12 @@ func (b biz) ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeats
 	reservingSeatsMap := make(map[string]string) // map seat id -> user id
 	err = b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
 	if err == nil { // lay duoc thong tin slot trong redis
-		if val, ok := reservingSeatsMap[data.SeatID]; ok && utils.IsValidUUID(val) { // neu ma seat nay dang co nguoi dat
-			return response, e.ErrSeatReserving
+		if val, ok := reservingSeatsMap[data.SeatID]; ok && utils.IsValidUUID(val) { // neu ma seat nay dang co nguoi khac dat
+			if data.UserID != val {
+				return response, e.ErrSeatReserving
+			} else {
+				delete(reservingSeatsMap, data.SeatID) // neu cho nay dang duoc dat thi bo dat
+			}
 		}
 	}
 
