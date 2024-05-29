@@ -8,6 +8,7 @@ import (
 	"golang-server/module/core/model"
 	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
+	"golang-server/pkg/utils"
 
 	"gorm.io/gorm"
 )
@@ -50,6 +51,7 @@ func (a orderStorage) TxCreateOrder(ctx context.Context, userID string, data dto
 	orderCreate := model.OrderModel{
 		UserID: userID,
 		SlotID: data.SlotID,
+		ID:     utils.NewOrderID(),
 	}
 	err := tx.Create(&orderCreate).Error
 	if err != nil {

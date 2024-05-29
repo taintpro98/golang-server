@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 
+	"github.com/oklog/ulid/v2"
 	"gorm.io/gorm"
 )
 
@@ -10,6 +11,10 @@ const (
 	CtxTxKey = "Tx"
 	MaxLimit = 100
 )
+
+func NewOrderID() string {
+	return ulid.Make().String()
+}
 
 func getTX(ctx context.Context, db *gorm.DB) *gorm.DB {
 	tx, ok := ctx.Value(CtxTxKey).(*gorm.DB)
