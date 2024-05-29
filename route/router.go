@@ -24,6 +24,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		storage.NewRoomStorage(cnf.Database, db, redisClient),
 		storage.NewSeatStorage(cnf.Database, db),
 		storage.NewSlotSeatStorage(cnf.Database, db, redisClient),
+		storage.NewOrderStorage(cnf.Database, db),
 	)
 	trpt := transport.NewTransport(biz)
 
@@ -42,6 +43,11 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		{
 			movieApi.GET("", trpt.ListMovies)
 			movieApi.GET("/:movieID/slots", trpt.ListMovieSlots)
+		}
+
+		orderApi := publicApi.Group("/orders")
+		{
+			orderApi.POST("", trpt.CreateOrder)
 		}
 	}
 

@@ -23,6 +23,9 @@ type IBiz interface {
 	ListMovies(ctx context.Context, data dto.ListMoviesRequest) (dto.ListMoviesResponse, *int64, error)
 	ListMovieSlots(ctx context.Context, movieID string) (dto.ListMovieSlotsResponse, error)
 
+	//orders
+	CreateOrder(ctx context.Context, userID string, data dto.CreateOrderRequest) (dto.CreateOrderResponse, error)
+
 	// admin
 	// movies
 	AdminCreateMovie(ctx context.Context, data dto.AdminCreateMovieRequest) (dto.AdminCreateMovieResponse, error)
@@ -43,6 +46,7 @@ type biz struct {
 	roomStorage         storage.IRoomStorage
 	seatStorage         storage.ISeatStorage
 	slotSeatStorage     storage.ISlotSeatStorage
+	orderStorage        storage.IOrderStorage
 }
 
 func NewBiz(
@@ -54,6 +58,7 @@ func NewBiz(
 	roomStorage storage.IRoomStorage,
 	seatStorage storage.ISeatStorage,
 	slotSeatStorage storage.ISlotSeatStorage,
+	orderStorage storage.IOrderStorage,
 ) IBiz {
 	return biz{
 		redisClient:         redisClient,
@@ -64,5 +69,6 @@ func NewBiz(
 		roomStorage:         roomStorage,
 		seatStorage:         seatStorage,
 		slotSeatStorage:     slotSeatStorage,
+		orderStorage:        orderStorage,
 	}
 }
