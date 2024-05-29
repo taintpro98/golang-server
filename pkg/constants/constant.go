@@ -8,4 +8,6 @@ const (
 
 const (
 	SlotSeatsMapKey = "slot_seats_map_key"
+
+	ListRoomsKey = "list_rooms_key"
 )

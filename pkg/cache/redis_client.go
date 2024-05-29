@@ -14,7 +14,7 @@ import (
 
 type IRedisClient interface {
 	Get(ctx context.Context, key string, outputType interface{}) error
-	Set(ctx context.Context, key string, value interface{}, ttl int64) error
+	Set(ctx context.Context, key string, value interface{}, ttl int64) error // interface khong phai la con tro
 }
 
 type redisClient struct {
