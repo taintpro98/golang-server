@@ -13,7 +13,7 @@ func (t *Transport) CreateOrder(ctx *gin.Context) {
 		dto.HandleResponse(ctx, data, err)
 		return
 	}
-	userID := ctx.GetHeader(constants.XUserID)
+	userID := ctx.MustGet(constants.XUserID).(string)
 	result, err := t.biz.CreateOrder(ctx, userID, data)
 	dto.HandleResponse(ctx, result, err)
 }
