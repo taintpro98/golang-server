@@ -42,3 +42,19 @@ kafka:
 telegram_bot:
   token: abc
   chat_id: 123
+
+token:
+  priviate_key_path: cert/private.key
+  public_key_path: cert/public.key
+  access_token_duration: 3000h
+  refresh_token_duration: 4000h
+  admin_access_token_duration: 24h
+  admin_refresh_token_duration: 48h
+  emddi_secret_key: ASDHASJDKHASDKj
+  cache_in_mem: true
+  forever_token_roles:
+    - partner
+    - green_portal
+    - biz_portal
+    - partner_hub
+    - partner_triplayz

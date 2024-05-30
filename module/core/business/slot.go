@@ -63,7 +63,6 @@ func (b biz) GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieS
 	return response, nil
 }
 
-// ReserveSeats implements IBiz.
 func (b biz) ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeatsRequest) (dto.ReserveSeatsResponse, error) {
 	// cac ghe trong phong, ghe da duoc dat, get dang duoc dat
 	response := dto.ReserveSeatsResponse{
@@ -99,19 +98,29 @@ func (b biz) ReserveSeats(ctx *gin.Context, slotID string, data dto.ReserveSeats
 	// check reserving seats
 	slotKey := fmt.Sprintf("%s:%s", constants.SlotSeatsMapKey, slotID)
 	reservingSeatsMap := make(map[string]string) // map seat id -> user id
+	isValid := false
 	err = b.redisClient.Get(ctx, slotKey, &reservingSeatsMap)
-	if err == nil { // lay duoc thong tin slot trong redis
+	if err == nil && len(reservingSeatsMap) > 0 { // lay duoc thong tin slot trong redis
 		if val, ok := reservingSeatsMap[data.SeatID]; ok && utils.IsValidUUID(val) { // neu ma seat nay dang co nguoi khac dat
 			if data.UserID != val {
 				return response, e.ErrSeatReserving
 			} else {
 				delete(reservingSeatsMap, data.SeatID) // neu cho nay dang duoc dat thi bo dat
+				response.Status = constants.EmptySeat
 			}
+		} else {
+			isValid = true
 		}
+	} else { // cho nay chua co ai dat
+		isValid = true
 	}
 
-	// thoa man het cac dieu kien roi
-	reservingSeatsMap[data.SeatID] = data.UserID // cho user dat cho
+	if isValid {
+		// thoa man het cac dieu kien roi
+		reservingSeatsMap[data.SeatID] = data.UserID // cho user dat cho
+		response.Status = constants.ReservingSeat
+	}
+
 	err = b.redisClient.Set(ctx, slotKey, reservingSeatsMap, 0)
 	if err != nil {
 		logger.Error(ctx, err, "set ReserveSeats redis err")

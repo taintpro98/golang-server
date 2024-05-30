@@ -12,6 +12,7 @@ import (
 	"golang-server/pkg/logger"
 	"golang-server/pkg/telegram"
 	"golang-server/route"
+	"golang-server/token"
 	"net/http"
 	"os"
 	"os/signal"
@@ -44,6 +45,10 @@ func main() {
 	// if err != nil {
 	// 	logger.Error(ctx, err, "telegram bot get messages error")
 	// }
+	jwtMaker, err := token.NewJWTMaker(ctx, cnf.Token)
+	if err != nil {
+		logger.Panic(ctx, err, "init token maker error")
+	}
 
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
@@ -53,7 +58,7 @@ func main() {
 	)
 
 	route.RegisterHealthCheckRoute(engine)
-	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, telegramBot)
+	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, jwtMaker, telegramBot)
 	server := http.Server{
 		Addr:    cnf.AppInfo.ApiPort,
 		Handler: engine,

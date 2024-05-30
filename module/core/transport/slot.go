@@ -20,7 +20,7 @@ func (t *Transport) ReserveSeats(ctx *gin.Context) {
 		dto.HandleResponse(ctx, nil, err)
 		return
 	}
-	data.UserID = ctx.GetHeader(constants.XUserID)
+	data.UserID = ctx.MustGet(constants.XUserID).(string)
 	result, err := t.biz.ReserveSeats(ctx, slotID, data)
 	dto.HandleResponse(ctx, result, err)
 }

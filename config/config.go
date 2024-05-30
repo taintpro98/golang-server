@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/inhies/go-bytesize"
 	"github.com/mitchellh/mapstructure"
@@ -21,6 +22,7 @@ type Config struct {
 	RedisQueue  RedisQueueConfig `mapstructure:"redis_queue"`
 	Kafka       KafkaConfig      `mapstructure:"kafka"`
 	TelegramBot TelegramBot      `mapstructure:"telegram_bot"`
+	Token       Token            `mapstructure:"token"`
 }
 
 type KafkaConfig struct {
@@ -70,6 +72,18 @@ type DatabaseConfig struct {
 type TelegramBot struct {
 	ChatID int64  `mapstructure:"chat_id"`
 	Token  string `mapstructure:"token"`
+}
+
+type Token struct {
+	PrivateKeyPath            string        `mapstructure:"priviate_key_path"`
+	PublicKeyPath             string        `mapstructure:"public_key_path"`
+	AccessTokenDuration       time.Duration `mapstructure:"access_token_duration"`
+	RefreshTokenDuration      time.Duration `mapstructure:"refresh_token_duration"`
+	AdminAccessTokenDuration  time.Duration `mapstructure:"admin_access_token_duration"`
+	AdminRefreshTokenDuration time.Duration `mapstructure:"admin_refresh_token_duration"`
+	EmddiSecretKey            string        `mapstructure:"emddi_secret_key"`
+	CacheInMem                bool          `mapstructure:"cache_in_mem"`
+	ForeverTokenRoles         []string      `mapstructure:"forever_token_roles"`
 }
 
 // hex string to bytesize.ByteSize.

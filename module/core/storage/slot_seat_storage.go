@@ -68,6 +68,9 @@ func (u slotSeatStorage) ListCacheSlot(ctx context.Context, slotID string) ([]mo
 	}
 	result, err = u.List(ctx, dto.FilterSlotSeat{
 		SlotID: slotID,
+		CommonFilter: dto.CommonFilter{
+			Select: []string{"slot_seats.id", "slot_seats.slot_id", "slot_seats.seat_id", "slot_seats.order_id", "slot_seats.total_pay", "slot_seats.status"},
+		},
 	})
 	if err != nil {
 		return result, err

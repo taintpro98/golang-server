@@ -3,9 +3,9 @@ package business
 import (
 	"context"
 	"golang-server/module/core/dto"
-	"golang-server/module/core/model"
 	"golang-server/module/core/storage"
 	"golang-server/pkg/cache"
+	"golang-server/token"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +13,7 @@ import (
 type IBiz interface {
 	// user
 	// authenticate
-	Register(ctx context.Context, data dto.CreateUserRequest) (*model.UserModel, error)
+	Register(ctx context.Context, data dto.CreateUserRequest) (dto.CreateUserResponse, error)
 
 	//slots
 	GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieSlotInfoResponse, error)
@@ -38,6 +38,7 @@ type IBiz interface {
 }
 
 type biz struct {
+	jwtMaker            token.IJWTMaker
 	redisClient         cache.IRedisClient
 	userStorage         storage.IUserStorage
 	movieStorage        storage.IMovieStorage
@@ -50,6 +51,7 @@ type biz struct {
 }
 
 func NewBiz(
+	jwtMaker token.IJWTMaker,
 	redisClient cache.IRedisClient,
 	userStorage storage.IUserStorage,
 	movieStorage storage.IMovieStorage,
@@ -61,6 +63,7 @@ func NewBiz(
 	orderStorage storage.IOrderStorage,
 ) IBiz {
 	return biz{
+		jwtMaker:            jwtMaker,
 		redisClient:         redisClient,
 		userStorage:         userStorage,
 		movieStorage:        movieStorage,

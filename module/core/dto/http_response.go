@@ -80,3 +80,13 @@ func HandleResponse(ctx *gin.Context, data interface{}, err error, metadata ...i
 		HandleFailed(ctx, err)
 	}
 }
+
+func AbortJSON(ctx *gin.Context, err error) {
+	statusCode, msgCode, msg := getMessageCodeError(err)
+	ctx.AbortWithStatusJSON(
+		statusCode, ErrorResponse{
+			Code:    msgCode,
+			Message: msg,
+		},
+	)
+}

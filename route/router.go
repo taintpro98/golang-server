@@ -2,20 +2,22 @@ package route
 
 import (
 	"golang-server/config"
+	"golang-server/middleware"
 	"golang-server/module/core/business"
 	"golang-server/module/core/storage"
 	"golang-server/module/core/transport"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/telegram"
+	"golang-server/token"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient cache.IRedisClient, bot telegram.ITelegramBot) {
-	v1Api := e.Group("/v1")
-
+func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient cache.IRedisClient, jwtMaker token.IJWTMaker, bot telegram.ITelegramBot) {
+	// dependencies
 	biz := business.NewBiz(
+		jwtMaker,
 		redisClient,
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewMovieStorage(cnf.Database, db),
@@ -28,11 +30,15 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 	)
 	trpt := transport.NewTransport(biz)
 
+	// routes
+	v1Api := e.Group("/v1")
+
 	// public api
 	publicApi := v1Api.Group("/public")
-	{
-		publicApi.POST("/register", trpt.Register)
+	publicApi.POST("/register", trpt.Register)
 
+	publicApi.Use(middleware.AuthMiddleware(jwtMaker))
+	{
 		slotApi := publicApi.Group("/slots")
 		{
 			slotApi.GET("/:slotID", trpt.GetMovieSlotInfo)
