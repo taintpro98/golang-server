@@ -46,11 +46,16 @@ func (processor *syncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		if err != nil {
 			return err
 		}
+		logger.Info(ctx, fmt.Sprintf("handle batch with offset %s", userNum))
+
 		num, err := strconv.ParseInt(userNum.Value, 10, 64)
 		if err != nil {
 			return err
 		}
 		mUsers, err := processor.mUserStorage.ListUsers(ctx, num, 50)
+		if err != nil {
+			continue
+		}
 		var dataInsert []model.UserModel
 		for _, item := range mUsers {
 			dataInsert = append(dataInsert, model.UserModel{
@@ -63,8 +68,12 @@ func (processor *syncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		}
 		err = processor.userStorage.InsertBatch(ctx, dataInsert)
 		if err != nil {
-			logger.Error(ctx, err, "")
-			return err
+			continue
+		}
+		err = processor.constantStorage.UpdateMany(ctx, constants.UsersNum, fmt.Sprintf("%d", num+50))
+		if err != nil {
+			break
 		}
 	}
+	return nil
 }

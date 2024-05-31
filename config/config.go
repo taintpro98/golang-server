@@ -69,6 +69,7 @@ type DatabaseConfig struct {
 	Username     string `mapstructure:"username"`
 	Password     string `mapstructure:"password"`
 	DatabaseName string `mapstructure:"database_name"`
+	SSLMode      string `mapstructure:"sslmode"`
 }
 
 type TelegramBot struct {

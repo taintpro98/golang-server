@@ -11,8 +11,8 @@ func (b biz) Register(ctx context.Context, data dto.CreateUserRequest) (dto.Crea
 	// TODO: can dung transaction o day
 	var response dto.CreateUserResponse
 	userInsert := model.UserModel{
-		Phone: data.Phone,
-		Email: data.Email,
+		Phone: &data.Phone,
+		Email: &data.Email,
 	}
 	err := b.userStorage.Insert(ctx, &userInsert)
 	if err != nil {

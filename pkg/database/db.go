@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
 func NewPostgresqlDatabase(ctx context.Context, databaseCnf config.DatabaseConfig) (*gorm.DB, error) {
@@ -30,6 +31,10 @@ func NewPostgresqlDatabase(ctx context.Context, databaseCnf config.DatabaseConfi
 		},
 	), &gorm.Config{
 		Logger: newLogger,
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   fmt.Sprintf("%s.", databaseCnf.Schema),
+			SingularTable: true,
+		},
 	})
 	if err != nil {
 		return nil, err
@@ -41,13 +46,18 @@ func NewPostgresqlDatabase(ctx context.Context, databaseCnf config.DatabaseConfi
 	return client, err
 }
 
-func GetDatabaseDSN(cnf config.DatabaseConfig) string {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
-		cnf.Host,
-		cnf.Username,
-		cnf.Password,
-		cnf.DatabaseName,
-		cnf.Port,
+func GetDatabaseDSN(DBConf config.DatabaseConfig) string {
+	dsn := fmt.Sprintf(
+		"host=%s port=%s user=%s dbname=%s TimeZone=%s",
+		DBConf.Host, DBConf.Port, DBConf.Username, DBConf.DatabaseName, "UTC",
 	)
+
+	if DBConf.SSLMode != "" {
+		dsn += fmt.Sprintf(" sslmode=%s", DBConf.SSLMode)
+	}
+
+	if DBConf.Password != "" {
+		dsn += fmt.Sprintf(" password=%s", DBConf.Password)
+	}
 	return dsn
 }
