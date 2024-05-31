@@ -27,6 +27,7 @@ type IBiz interface {
 	CreateOrder(ctx context.Context, userID string, data dto.CreateOrderRequest) (dto.CreateOrderResponse, error)
 
 	// admin
+	AdminSyncUsers(ctx context.Context) error
 	// movies
 	AdminCreateMovie(ctx context.Context, data dto.AdminCreateMovieRequest) (dto.AdminCreateMovieResponse, error)
 
@@ -39,6 +40,7 @@ type IBiz interface {
 
 type biz struct {
 	jwtMaker            token.IJWTMaker
+	asynqStorage        storage.IAsynqStorage
 	redisClient         cache.IRedisClient
 	userStorage         storage.IUserStorage
 	movieStorage        storage.IMovieStorage
@@ -48,11 +50,13 @@ type biz struct {
 	seatStorage         storage.ISeatStorage
 	slotSeatStorage     storage.ISlotSeatStorage
 	orderStorage        storage.IOrderStorage
+	constantStorage     storage.IConstantStorage
 }
 
 func NewBiz(
 	jwtMaker token.IJWTMaker,
 	redisClient cache.IRedisClient,
+	asynqStorage storage.IAsynqStorage,
 	userStorage storage.IUserStorage,
 	movieStorage storage.IMovieStorage,
 	notificationStorage storage.INotificationStorage,
@@ -61,9 +65,11 @@ func NewBiz(
 	seatStorage storage.ISeatStorage,
 	slotSeatStorage storage.ISlotSeatStorage,
 	orderStorage storage.IOrderStorage,
+	constantStorage storage.IConstantStorage,
 ) IBiz {
 	return biz{
 		jwtMaker:            jwtMaker,
+		asynqStorage:        asynqStorage,
 		redisClient:         redisClient,
 		userStorage:         userStorage,
 		movieStorage:        movieStorage,
@@ -73,5 +79,6 @@ func NewBiz(
 		seatStorage:         seatStorage,
 		slotSeatStorage:     slotSeatStorage,
 		orderStorage:        orderStorage,
+		constantStorage:     constantStorage,
 	}
 }

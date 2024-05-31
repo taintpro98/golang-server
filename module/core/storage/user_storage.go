@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"golang-server/config"
 	"golang-server/module/core/model"
 
@@ -10,6 +11,8 @@ import (
 
 type IUserStorage interface {
 	Insert(ctx context.Context, data *model.UserModel) error
+
+	InsertBatch(ctx context.Context, data []model.UserModel) error
 }
 
 type userStorage struct {
@@ -34,4 +37,17 @@ func (u userStorage) Insert(ctx context.Context, data *model.UserModel) error {
 		TableName: u.tableName(),
 		Data:      data,
 	})
+}
+
+// InsertBatch implements IUserStorage.
+func (u userStorage) InsertBatch(ctx context.Context, data []model.UserModel) error {
+	// Create a transaction
+	tx := u.table(u.tableName()).Begin()
+	if err := tx.Create(&data).Error; err != nil {
+		tx.Rollback()
+		fmt.Println("Error inserting records:", err)
+		return err
+	}
+	tx.Commit()
+	return nil
 }

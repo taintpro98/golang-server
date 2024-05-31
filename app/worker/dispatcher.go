@@ -16,5 +16,5 @@ func NewWorkerDispatcher(
 	mux *asynq.ServeMux,
 	telegramBot telegram.ITelegramBot,
 ) {
-	mux.Handle(task.AsynqTaskQueueName(cnf.RedisQueue.Prefix), processor.NewAsynqTaskProcessor())
+	mux.Handle(task.SyncUsersQueueName(cnf.RedisQueue.Prefix), processor.NewSyncUsersProcessor())
 }

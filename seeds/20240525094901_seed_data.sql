@@ -1,5 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
+insert into
+  public.constants (code, "value")
+values
+  ('users_num', '0');
+
 INSERT INTO
   public.movies (
     id,

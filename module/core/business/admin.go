@@ -7,6 +7,11 @@ import (
 	"golang-server/pkg/e"
 )
 
+// AdminSyncUsers implements IBiz.
+func (b biz) AdminSyncUsers(ctx context.Context) error {
+	return b.asynqStorage.AddToSyncUsersTask(ctx)
+}
+
 // AdminCreateRoom implements IBiz.
 func (b biz) AdminCreateRoom(ctx context.Context, data dto.AdminCreateRoomRequest) (dto.AdminCreateRoomResponse, error) {
 	var response dto.AdminCreateRoomResponse

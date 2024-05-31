@@ -6,7 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (t Transport) AdminCreateMovie(ctx *gin.Context) {
+func (t *Transport) AdminSyncUsers(ctx *gin.Context) {
+	err := t.biz.AdminSyncUsers(ctx)
+	dto.HandleResponse(ctx, nil, err)
+}
+
+func (t *Transport) AdminCreateMovie(ctx *gin.Context) {
 	var data dto.AdminCreateMovieRequest
 	if err := ctx.ShouldBindJSON(&data); err != nil {
 		dto.HandleResponse(ctx, nil, err)

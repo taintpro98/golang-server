@@ -3,7 +3,6 @@ package token
 import (
 	"context"
 	"crypto/rsa"
-	"fmt"
 	"golang-server/config"
 	"golang-server/module/core/dto"
 	"golang-server/pkg/e"
@@ -77,7 +76,7 @@ func (j jwtMaker) VerifyToken(ctx context.Context, tokenString string) (interfac
 	if claims, ok := token.Claims.(*dto.UserPayload); ok && token.Valid {
 		return claims, nil
 	} else {
-		fmt.Println("Token is invalid")
+		logger.Info(ctx, "Token is invalid")
 		return nil, e.ErrUnauthorized
 	}
 }

@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"golang-server/app/worker/task"
 	"golang-server/config"
-	"golang-server/module/core/model"
 	"golang-server/pkg/logger"
 
 	"github.com/hibiken/asynq"
 )
 
 type IAsynqStorage interface {
-	AddToAsynqTask(ctx context.Context, transaction model.UserModel) error
+	AddToSyncUsersTask(ctx context.Context) error
 }
 
 type asynqStorage struct {
@@ -30,17 +29,17 @@ func NewAsynqStorage(
 	}
 }
 
-// AddToAsynqTask implements IAsynqStorage.
-func (s asynqStorage) AddToAsynqTask(ctx context.Context, transaction model.UserModel) error {
-	taskAsynq, err := task.NewAsynqTask(ctx, s.cfg, transaction)
+// AddToSyncUsersTask implements IAsynqStorage.
+func (s asynqStorage) AddToSyncUsersTask(ctx context.Context) error {
+	taskAsynq, err := task.NewSyncUsersTask(ctx, s.cfg)
 	if err != nil {
-		logger.Error(ctx, err, "AddToAsynqTask could not create task")
+		logger.Error(ctx, err, "AddToSyncUsersTask could not create task")
 	}
 	info, err := s.redisQueue.Enqueue(taskAsynq)
 	if err != nil {
-		logger.Error(ctx, err, "AddToAsynqTask could not enqueue task")
+		logger.Error(ctx, err, "AddToSyncUsersTask could not enqueue task")
 	} else {
-		logger.Info(ctx, fmt.Sprintf("enqueued AddToAsynqTask: id=%s queue=%s", info.ID, info.Queue))
+		logger.Info(ctx, fmt.Sprintf("enqueued AddToSyncUsersTask: id=%s queue=%s", info.ID, info.Queue))
 	}
 	return err
 }

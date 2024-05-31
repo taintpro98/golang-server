@@ -24,3 +24,13 @@ func NewServer(cfg config.RedisQueueConfig) *asynq.Server {
 	)
 	return srv
 }
+
+func getConfig(cfg config.RedisQueueConfig) asynq.RedisClientOpt {
+	address := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+	return asynq.RedisClientOpt{Addr: address}
+}
+
+func NewClient(cfg config.RedisQueueConfig) *asynq.Client {
+	clientOptions := getConfig(cfg)
+	return asynq.NewClient(clientOptions)
+}

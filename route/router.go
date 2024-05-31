@@ -10,15 +10,27 @@ import (
 	"golang-server/pkg/telegram"
 	"golang-server/token"
 
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"gorm.io/gorm"
 )
 
-func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient cache.IRedisClient, jwtMaker token.IJWTMaker, bot telegram.ITelegramBot) {
+func RegisterRoutes(
+	e *gin.Engine,
+	cnf config.Config,
+	db *gorm.DB,
+	redisClient cache.IRedisClient,
+	redisQueue *asynq.Client,
+	jwtMaker token.IJWTMaker,
+	es *elasticsearch.Client,
+	bot telegram.ITelegramBot,
+) {
 	// dependencies
 	biz := business.NewBiz(
 		jwtMaker,
 		redisClient,
+		storage.NewAsynqStorage(cnf.RedisQueue, redisQueue),
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewMovieStorage(cnf.Database, db),
 		storage.NewNotificationStorage(bot),
@@ -27,6 +39,7 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 		storage.NewSeatStorage(cnf.Database, db),
 		storage.NewSlotSeatStorage(cnf.Database, db, redisClient),
 		storage.NewOrderStorage(cnf.Database, db),
+		storage.NewConstantStorage(cnf.Database, db),
 	)
 	trpt := transport.NewTransport(biz)
 
@@ -60,6 +73,11 @@ func RegisterRoutes(e *gin.Engine, cnf config.Config, db *gorm.DB, redisClient c
 	// admin api
 	adminApi := v1Api.Group("/admin")
 	{
+		asynqApi := adminApi.Group("/asynq")
+		{
+			asynqApi.GET("/sync-users", trpt.AdminSyncUsers)
+		}
+
 		movieApi := adminApi.Group("/movies")
 		{
 			movieApi.POST("", trpt.AdminCreateMovie)

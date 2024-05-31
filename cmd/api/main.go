@@ -9,7 +9,9 @@ import (
 	"golang-server/middleware"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/database"
+	"golang-server/pkg/elastic"
 	"golang-server/pkg/logger"
+	"golang-server/pkg/queue"
 	"golang-server/pkg/telegram"
 	"golang-server/route"
 	"golang-server/token"
@@ -41,6 +43,9 @@ func main() {
 	if err != nil {
 		logger.Error(ctx, err, "init telegram bot error")
 	}
+
+	redisQueue := queue.NewClient(cnf.RedisQueue)
+
 	// err = telegramBot.GetMessages(ctx)
 	// if err != nil {
 	// 	logger.Error(ctx, err, "telegram bot get messages error")
@@ -48,6 +53,10 @@ func main() {
 	jwtMaker, err := token.NewJWTMaker(ctx, cnf.Token)
 	if err != nil {
 		logger.Panic(ctx, err, "init token maker error")
+	}
+	es, err := elastic.New(ctx, &cnf.Elastic)
+	if err != nil {
+		logger.Panic(ctx, err, "init elastic connection error")
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -58,7 +67,7 @@ func main() {
 	)
 
 	route.RegisterHealthCheckRoute(engine)
-	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, jwtMaker, telegramBot)
+	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, redisQueue, jwtMaker, es, telegramBot)
 	server := http.Server{
 		Addr:    cnf.AppInfo.ApiPort,
 		Handler: engine,
@@ -86,4 +95,6 @@ func main() {
 	} else {
 		logger.Info(ctx, "Server shutdown complete.")
 	}
+
+	redisQueue.Close()
 }

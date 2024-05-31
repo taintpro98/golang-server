@@ -17,12 +17,14 @@ const KEY_CONFIG_URL = "--config_url"
 
 type Config struct {
 	AppInfo     ConfigAppInfo    `mapstructure:"app_info"`
+	DBM         DatabaseConfig   `mapstructure:"dbm"`
 	Database    DatabaseConfig   `mapstructure:"database"`
 	Redis       RedisConfig      `mapstructure:"redis"`
 	RedisQueue  RedisQueueConfig `mapstructure:"redis_queue"`
 	Kafka       KafkaConfig      `mapstructure:"kafka"`
 	TelegramBot TelegramBot      `mapstructure:"telegram_bot"`
 	Token       Token            `mapstructure:"token"`
+	Elastic     ElasticConfig    `mapstructure:"elastic"`
 }
 
 type KafkaConfig struct {
@@ -84,6 +86,13 @@ type Token struct {
 	EmddiSecretKey            string        `mapstructure:"emddi_secret_key"`
 	CacheInMem                bool          `mapstructure:"cache_in_mem"`
 	ForeverTokenRoles         []string      `mapstructure:"forever_token_roles"`
+}
+
+type ElasticConfig struct {
+	Addresses            string `mapstructure:"addresses"`
+	Username             string `mapstructure:"username"`
+	Password             string `mapstructure:"password"`
+	SupplierSettingIndex string `mapstructure:"supplier_setting_index"`
 }
 
 // hex string to bytesize.ByteSize.

@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"golang-server/config"
 	"golang-server/module/core/dto"
 	"golang-server/module/core/model"
@@ -78,7 +77,7 @@ func (a orderStorage) TxCreateOrder(ctx context.Context, userID string, data dto
 
 	err = tx.Commit().Error
 	if err != nil {
-		fmt.Println("TxCreateOrder Error when commit transaction", err)
+		logger.Error(ctx, err, "TxCreateOrder Error when commit transaction")
 		return response, err
 	}
 	return response, nil
