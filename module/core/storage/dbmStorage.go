@@ -11,7 +11,7 @@ import (
 )
 
 type IDbmStorage interface {
-	ListUsers(ctx context.Context, offset int64, limit int) ([]model.MUserModel, error)
+	ListUsers(ctx context.Context, offset int, limit int) ([]model.MUserModel, error)
 }
 
 type dbmStorage struct {
@@ -31,9 +31,9 @@ func (d dbmStorage) table() *gorm.DB {
 }
 
 // ListUsers implements IDbmStorage.
-func (d dbmStorage) ListUsers(ctx context.Context, offset int64, limit int) ([]model.MUserModel, error) {
+func (d dbmStorage) ListUsers(ctx context.Context, offset int, limit int) ([]model.MUserModel, error) {
 	var result []model.MUserModel
-	err := d.table().Select("user_id", "loyalty_id", "email", "phone", "cur_original_id").Find(&result).Error
+	err := d.table().Select("user_id", "loyalty_id", "email", "phone", "cur_original_id").Order("created_at").Offset(offset).Limit(limit).Find(&result).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return result, err
 	}

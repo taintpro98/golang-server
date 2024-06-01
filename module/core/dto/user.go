@@ -1,11 +1,31 @@
 package dto
 
+import "golang-server/module/core/model"
+
 type CommonFilter struct {
 	Limit    int
 	Offset   *int
 	Select   []string
 	Sort     string
 	Preloads []string
+}
+
+type FilterUser struct {
+	Phone        string
+	Email        string
+	ID           string
+	CommonFilter CommonFilter
+}
+
+type SearchUsersRequest struct {
+	UserID string `form:"user_id,omitempty"`
+	Phone  string `form:"phone,omitempty"`
+	Email  string `form:"email,omitempty"`
+	Search string `form:"search,omitempty"`
+}
+
+type SearchUsersResponse struct {
+	Users []model.UserModel `json:"users"`
 }
 
 type UserPayload struct {

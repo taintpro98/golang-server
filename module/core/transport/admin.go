@@ -6,6 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (t *Transport) AdminSearchUsers(ctx *gin.Context) {
+	var param dto.SearchUsersRequest
+	if err := ctx.ShouldBindQuery(&param); err != nil {
+		dto.HandleResponse(ctx, nil, err)
+		return
+	}
+	result, err := t.biz.AdminSearchUsers(ctx, param)
+	dto.HandleResponse(ctx, result, err)
+}
+
 func (t *Transport) AdminSyncUsers(ctx *gin.Context) {
 	err := t.biz.AdminSyncUsers(ctx)
 	dto.HandleResponse(ctx, nil, err)

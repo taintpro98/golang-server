@@ -27,11 +27,10 @@ func (b biz) Register(ctx context.Context, data dto.CreateUserRequest) (dto.Crea
 		return response, err
 	}
 	response.Token = tokenString
-	err = b.notificationStorage.SendTelegramNotification(ctx, dto.UserCreatedNotification{
-		UserID: userInsert.ID,
-	})
+	// thong bao va day vao es (bat dong bo)
+	err = b.asynqStorage.AddToRegisterUserTask(ctx, userInsert)
 	if err != nil {
-		logger.Error(ctx, err, "send user created noti error")
+		logger.Error(ctx, err, "biz Register AddToRegisterUserTask error")
 	}
 	return response, nil
 }

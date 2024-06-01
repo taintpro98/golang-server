@@ -14,7 +14,7 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-type syncUsersProcessor struct {
+type SyncUsersProcessor struct {
 	constantStorage storage.IConstantStorage
 	mUserStorage    storage.IDbmStorage
 	userStorage     storage.IUserStorage
@@ -24,15 +24,15 @@ func NewSyncUsersProcessor(
 	constantStorage storage.IConstantStorage,
 	mUserStorage storage.IDbmStorage,
 	userStorage storage.IUserStorage,
-) *syncUsersProcessor {
-	return &syncUsersProcessor{
+) *SyncUsersProcessor {
+	return &SyncUsersProcessor{
 		constantStorage: constantStorage,
 		mUserStorage:    mUserStorage,
 		userStorage:     userStorage,
 	}
 }
 
-func (processor *syncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.Task) error {
+func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.Task) error {
 	var p task.SyncUsersData
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		logger.Error(ctx, err, fmt.Sprintf("json.Unmarshal failed: %v: %v", err, asynq.SkipRetry))
@@ -48,11 +48,11 @@ func (processor *syncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		}
 		logger.Info(ctx, fmt.Sprintf("handle batch with offset %s", userNum))
 
-		num, err := strconv.ParseInt(userNum.Value, 10, 64)
+		num, err := strconv.Atoi(userNum.Value)
 		if err != nil {
 			return err
 		}
-		mUsers, err := processor.mUserStorage.ListUsers(ctx, num, 50)
+		mUsers, err := processor.mUserStorage.ListUsers(ctx, num, constants.MBatchSize)
 		if err != nil {
 			continue
 		}
@@ -70,8 +70,9 @@ func (processor *syncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		if err != nil {
 			continue
 		}
-		err = processor.constantStorage.UpdateMany(ctx, constants.UsersNum, fmt.Sprintf("%d", num+50))
+		err = processor.constantStorage.UpdateMany(ctx, constants.UsersNum, fmt.Sprintf("%d", num+constants.MBatchSize))
 		if err != nil {
+			logger.Error(ctx, err, fmt.Sprintf("Stopped by updating %d constant error", num+constants.MBatchSize))
 			break
 		}
 	}

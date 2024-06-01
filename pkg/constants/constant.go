@@ -1,5 +1,7 @@
 package constants
 
+const MBatchSize = 100
+
 const (
 	TraceID      = "request_id"
 	KeyRequestID = "X-REQUEST-ID"

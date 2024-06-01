@@ -30,6 +30,7 @@ func RegisterRoutes(
 	biz := business.NewBiz(
 		jwtMaker,
 		redisClient,
+		storage.NewElasticStorage(es),
 		storage.NewAsynqStorage(cnf.RedisQueue, redisQueue),
 		storage.NewUserStorage(cnf.Database, db),
 		storage.NewMovieStorage(cnf.Database, db),
@@ -73,6 +74,11 @@ func RegisterRoutes(
 	// admin api
 	adminApi := v1Api.Group("/admin")
 	{
+		userApi := adminApi.Group("/users")
+		{
+			userApi.GET("", trpt.AdminSearchUsers)
+		}
+
 		asynqApi := adminApi.Group("/asynq")
 		{
 			asynqApi.GET("/sync-users", trpt.AdminSyncUsers)

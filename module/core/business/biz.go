@@ -27,7 +27,10 @@ type IBiz interface {
 	CreateOrder(ctx context.Context, userID string, data dto.CreateOrderRequest) (dto.CreateOrderResponse, error)
 
 	// admin
+	//users
+	AdminSearchUsers(ctx context.Context, param dto.SearchUsersRequest) (dto.SearchUsersResponse, error)
 	AdminSyncUsers(ctx context.Context) error
+
 	// movies
 	AdminCreateMovie(ctx context.Context, data dto.AdminCreateMovieRequest) (dto.AdminCreateMovieResponse, error)
 
@@ -40,8 +43,9 @@ type IBiz interface {
 
 type biz struct {
 	jwtMaker            token.IJWTMaker
-	asynqStorage        storage.IAsynqStorage
 	redisClient         cache.IRedisClient
+	elasticStorage      storage.IElasticStorage
+	asynqStorage        storage.IAsynqStorage
 	userStorage         storage.IUserStorage
 	movieStorage        storage.IMovieStorage
 	notificationStorage storage.INotificationStorage
@@ -56,6 +60,7 @@ type biz struct {
 func NewBiz(
 	jwtMaker token.IJWTMaker,
 	redisClient cache.IRedisClient,
+	elasticStorage storage.IElasticStorage,
 	asynqStorage storage.IAsynqStorage,
 	userStorage storage.IUserStorage,
 	movieStorage storage.IMovieStorage,
@@ -69,6 +74,7 @@ func NewBiz(
 ) IBiz {
 	return biz{
 		jwtMaker:            jwtMaker,
+		elasticStorage:      elasticStorage,
 		asynqStorage:        asynqStorage,
 		redisClient:         redisClient,
 		userStorage:         userStorage,
