@@ -18,4 +18,4 @@ app.env
 secrets
 cmd/test.go
 
-./docker/redis-data/dump.rdb
+docker/redis-data/dump.rdb
