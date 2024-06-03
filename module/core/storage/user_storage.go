@@ -13,6 +13,8 @@ import (
 )
 
 type IUserStorage interface {
+	Count(ctx context.Context, filter dto.FilterUser) (*int64, error)
+
 	List(ctx context.Context, filter dto.FilterUser) ([]model.UserModel, error)
 
 	Insert(ctx context.Context, data *model.UserModel) error
@@ -51,6 +53,16 @@ func (s userStorage) BuildQuery(filter dto.FilterUser) *gorm.DB {
 		query = query.Where("email = ?", filter.Email)
 	}
 	return query
+}
+
+// Count implements IUserStorage.
+func (u userStorage) Count(ctx context.Context, filter dto.FilterUser) (*int64, error) {
+	return u.CCount(ctx, CommonStorageParams{
+		TableName:    u.tableName(),
+		Filter:       filter,
+		CommonFilter: filter.CommonFilter,
+		Query:        u.BuildQuery(filter),
+	})
 }
 
 func (u userStorage) Insert(ctx context.Context, data *model.UserModel) error {

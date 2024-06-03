@@ -28,7 +28,7 @@ type IBiz interface {
 
 	// admin
 	//users
-	AdminSearchUsers(ctx context.Context, param dto.SearchUsersRequest) (dto.SearchUsersResponse, error)
+	AdminSearchUsers(ctx context.Context, param dto.SearchUsersRequest) (dto.SearchUsersResponse, *int64, error)
 	AdminSyncUsers(ctx context.Context) error
 
 	// movies

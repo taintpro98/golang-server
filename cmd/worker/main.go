@@ -43,12 +43,14 @@ func main() {
 	if err != nil {
 		logger.Panic(ctx, err, "init elastic connection error")
 	}
+	redisQueue := queue.NewClient(cnf.RedisQueue)
+	defer redisQueue.Close()
 
 	srv := queue.NewServer(cnf.RedisQueue)
 
 	// mux maps a type to a handler
 	mux := asynq.NewServeMux()
-	worker.NewWorkerDispatcher(ctx, cnf, redisClient, es, postgresqlDB, mDB, mux, telegramBot)
+	worker.NewWorkerDispatcher(ctx, cnf, redisClient, es, postgresqlDB, mDB, mux, redisQueue, telegramBot)
 
 	if err := srv.Run(mux); err != nil {
 		log.Fatalf("could not run server: %v", err)

@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hibiken/asynq"
 	"golang-server/app/worker/task"
 	"golang-server/module/core/dto"
-	"golang-server/module/core/model"
 	"golang-server/module/core/storage"
 	"golang-server/pkg/logger"
+
+	"github.com/hibiken/asynq"
 )
 
 type RegisterUserProcessor struct {
@@ -38,12 +38,12 @@ func (processor *RegisterUserProcessor) ProcessTask(ctx context.Context, t *asyn
 		Key:   "data",
 		Value: data,
 	})
-	err := processor.elasticStorage.IndexUsers(ctx, []model.UserModel{data})
+	err := processor.elasticStorage.IndexUsers(ctx, data)
 	if err != nil {
 		logger.Error(ctx, err, "RegisterUserProcessor ProcessTask IndexUsers error")
 	}
 	err = processor.notificationStorage.SendTelegramNotification(ctx, dto.UserCreatedNotification{
-		UserID: data.ID,
+		Users: data,
 	})
 	if err != nil {
 		logger.Error(ctx, err, "RegisterUserProcessor SendTelegramNotification error")

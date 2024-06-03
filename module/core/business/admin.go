@@ -8,23 +8,28 @@ import (
 )
 
 // AdminSearchUsers implements IBiz.
-func (b biz) AdminSearchUsers(ctx context.Context, param dto.SearchUsersRequest) (dto.SearchUsersResponse, error) {
+func (b biz) AdminSearchUsers(ctx context.Context, param dto.SearchUsersRequest) (dto.SearchUsersResponse, *int64, error) {
 	var response dto.SearchUsersResponse
 	if param.Search != "" {
 		users, err := b.elasticStorage.SearchUsers(ctx, param.Search)
 		response.Users = users
-		return response, err
+		return response, nil, err
 	}
-	users, err := b.userStorage.List(ctx, dto.FilterUser{
+	userFilter := dto.FilterUser{
 		CommonFilter: dto.CommonFilter{
 			Select: []string{"id", "phone", "email"},
 		},
-	})
+	}
+	users, err := b.userStorage.List(ctx, userFilter)
 	if err != nil {
-		return response, err
+		return response, nil, err
 	}
 	response.Users = users
-	return response, nil
+	count, err := b.userStorage.Count(ctx, userFilter)
+	if err != nil {
+		return response, nil, err
+	}
+	return response, count, nil
 }
 
 // AdminSyncUsers implements IBiz.

@@ -24,6 +24,7 @@ func main() {
 		logger.Panic(ctx, err, "init postgresql database error")
 	}
 	redisQueue := queue.NewClient(cnf.RedisQueue)
+	defer redisQueue.Close()
 	// Create a new cron scheduler
 	cr := cron.New()
 	scheduler.NewSchedulerDispatcher(ctx, cnf, cr, postgresqlDB, redisQueue)

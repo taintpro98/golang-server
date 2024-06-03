@@ -18,6 +18,7 @@ type FilterUser struct {
 }
 
 type SearchUsersRequest struct {
+	Paginate
 	UserID string `form:"user_id,omitempty"`
 	Phone  string `form:"phone,omitempty"`
 	Email  string `form:"email,omitempty"`
@@ -46,5 +47,5 @@ type CreateUserResponse struct {
 }
 
 type UserCreatedNotification struct {
-	UserID string `json:"user_id"`
+	Users []model.UserModel `json:"users"`
 }

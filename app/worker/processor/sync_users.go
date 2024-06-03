@@ -19,17 +19,20 @@ type SyncUsersProcessor struct {
 	constantStorage storage.IConstantStorage
 	mUserStorage    storage.IDbmStorage
 	userStorage     storage.IUserStorage
+	asynqStorage    storage.IAsynqStorage
 }
 
 func NewSyncUsersProcessor(
 	constantStorage storage.IConstantStorage,
 	mUserStorage storage.IDbmStorage,
 	userStorage storage.IUserStorage,
+	asynqStorage storage.IAsynqStorage,
 ) *SyncUsersProcessor {
 	return &SyncUsersProcessor{
 		constantStorage: constantStorage,
 		mUserStorage:    mUserStorage,
 		userStorage:     userStorage,
+		asynqStorage:    asynqStorage,
 	}
 }
 
@@ -75,6 +78,7 @@ func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 			logger.Error(ctx, err, fmt.Sprintf("Stopped by updating %d constant error", num+constants.MBatchSize))
 			break
 		}
+		processor.asynqStorage.AddToRegisterUserTask(ctx, dataInsert)
 	}
 	return nil
 }

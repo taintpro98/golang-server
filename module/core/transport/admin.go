@@ -12,8 +12,17 @@ func (t *Transport) AdminSearchUsers(ctx *gin.Context) {
 		dto.HandleResponse(ctx, nil, err)
 		return
 	}
-	result, err := t.biz.AdminSearchUsers(ctx, param)
-	dto.HandleResponse(ctx, result, err)
+	result, total, err := t.biz.AdminSearchUsers(ctx, param)
+	if err != nil {
+		dto.HandleResponse(ctx, nil, err)
+	} else {
+		limit, offset := param.Paginate.InfoPaginate()
+		dto.HandleResponse(ctx, result, nil, dto.PaginateResponse{
+			Total:  total,
+			Limit:  limit,
+			Offset: offset,
+		})
+	}
 }
 
 func (t *Transport) AdminSyncUsers(ctx *gin.Context) {

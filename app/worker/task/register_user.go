@@ -17,13 +17,13 @@ func RegisterUserQueueName(prefix string) string {
 }
 
 type RegisterUserData struct {
-	Data model.UserModel `json:"data"`
+	Data []model.UserModel `json:"data"`
 }
 
 func NewRegisterUserTask(
 	ctx context.Context,
 	cnf config.RedisQueueConfig,
-	data model.UserModel,
+	data []model.UserModel,
 ) (*asynq.Task, error) {
 	payload, err := json.Marshal(RegisterUserData{
 		Data: data,

@@ -30,3 +30,38 @@ go run ./cmd/migration/main.go -dir migrations up
 go run ./cmd/migration/main.go -dir seeds create ${FILE_NAME} sql
 go run ./cmd/migration/main.go -dir seeds up
 ```
+
+### Elastic search
+- [Dashboard](http://localhost:5601/)
+```
+{
+  "query": {
+    "match_all": {}
+  }
+}
+{
+  "query": {
+    "wildcard": {
+      "phone": "*191954*"
+    }
+  }
+}
+{
+    "query": {
+        "bool": {
+            "should": [
+                {
+                    "wildcard": {
+                        "phone": "*191*"
+                    }
+                },
+                {
+                    "wildcard": {
+                        "email": "*191*"
+                    }
+                }
+            ]
+        }
+    }
+}
+```
