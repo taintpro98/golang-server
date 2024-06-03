@@ -107,8 +107,6 @@ CREATE UNIQUE INDEX users_loyalty_id_u_idx ON public.users(loyalty_id);
 
 CREATE UNIQUE INDEX users_phone_u_idx ON public.users(phone);
 
-CREATE UNIQUE INDEX users_email_u_idx ON public.users(email);
-
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin

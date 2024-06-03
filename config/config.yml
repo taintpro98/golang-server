@@ -60,7 +60,7 @@ token:
     - partner_triplayz
 
 elastic:
-  addresses: https://vpc-gsm-driver-dev-z2c7rt7lcdkiiptfhpbpzqqa2m.ap-southeast-1.es.amazonaws.com
+  addresses: http://localhost:9200
   username: app_service
   password: 0j@HlOUlcwBS
   supplier_setting_index: supplier_setting

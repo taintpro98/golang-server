@@ -10,6 +10,7 @@ import (
 	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
 	"strconv"
+	"time"
 
 	"github.com/hibiken/asynq"
 )
@@ -39,9 +40,9 @@ func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		return asynq.SkipRetry
 	}
 	logger.Info(ctx, "syncUsersProcessor ProcessTask")
-	// duration := time.Duration(5) * time.Second
-	// <-time.After(duration)
-	for {
+	duration := time.Duration(2) * time.Second
+	<-time.After(duration)
+	for T := 0; T < 5; T++ {
 		userNum, err := processor.constantStorage.FindOne(ctx, constants.UsersNum)
 		if err != nil {
 			return err
@@ -58,19 +59,18 @@ func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		}
 		var dataInsert []model.UserModel
 		for _, item := range mUsers {
-			dataInsert = append(dataInsert, model.UserModel{
+			dataDB := model.UserModel{
 				ID:            item.UserID,
 				LoyaltyID:     item.LoyaltyID,
 				Phone:         item.Phone,
-				Email:         &item.Email,
 				CurOriginalID: item.CurOriginalID,
-			})
+			}
+			if item.Email != "" {
+				dataDB.Email = &item.Email
+			}
+			dataInsert = append(dataInsert, dataDB)
 		}
-		err = processor.userStorage.InsertBatch(ctx, dataInsert)
-		if err != nil {
-			continue
-		}
-		err = processor.constantStorage.UpdateMany(ctx, constants.UsersNum, fmt.Sprintf("%d", num+constants.MBatchSize))
+		err = processor.userStorage.TxInsertMUsers(ctx, num, dataInsert)
 		if err != nil {
 			logger.Error(ctx, err, fmt.Sprintf("Stopped by updating %d constant error", num+constants.MBatchSize))
 			break

@@ -6,6 +6,8 @@ import (
 	"golang-server/config"
 	"golang-server/module/core/dto"
 	"golang-server/module/core/model"
+	"golang-server/pkg/constants"
+	"golang-server/pkg/logger"
 
 	"gorm.io/gorm"
 )
@@ -16,6 +18,8 @@ type IUserStorage interface {
 	Insert(ctx context.Context, data *model.UserModel) error
 
 	InsertBatch(ctx context.Context, data []model.UserModel) error
+
+	TxInsertMUsers(ctx context.Context, num int, data []model.UserModel) error
 }
 
 type userStorage struct {
@@ -79,5 +83,34 @@ func (u userStorage) InsertBatch(ctx context.Context, data []model.UserModel) er
 		return err
 	}
 	tx.Commit()
+	return nil
+}
+
+func (u userStorage) TxInsertMUsers(ctx context.Context, num int, data []model.UserModel) error {
+	// Create a transaction
+	tx := u.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Info(ctx, "rollback TxInsertMUsers", logger.LogField{
+				Key:   "data",
+				Value: data,
+			})
+			tx.Rollback()
+		}
+	}()
+	err := tx.Create(&data).Error
+	if err != nil {
+		logger.Error(ctx, err, "TxInsertMUsers create users error")
+		return err
+	}
+	err = tx.Model(&model.ConstantModel{}).Where("code = 'users_num'").Update("value", fmt.Sprintf("%d", num+constants.MBatchSize)).Error
+	if err != nil {
+		return err
+	}
+	err = tx.Commit().Error
+	if err != nil {
+		logger.Error(ctx, err, "TxInsertMUsers Error when commit transaction")
+		return err
+	}
 	return nil
 }
