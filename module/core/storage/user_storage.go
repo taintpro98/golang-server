@@ -19,9 +19,9 @@ type IUserStorage interface {
 
 	Insert(ctx context.Context, data *model.UserModel) error
 
-	InsertBatch(ctx context.Context, data []model.UserModel) error
+	InsertBatch(ctx context.Context, data *[]model.UserModel) error
 
-	TxInsertMUsers(ctx context.Context, num int, data []model.UserModel) error
+	TxInsertMUsers(ctx context.Context, num int, data []*model.UserModel) error
 }
 
 type userStorage struct {
@@ -86,19 +86,14 @@ func (u userStorage) List(ctx context.Context, filter dto.FilterUser) ([]model.U
 }
 
 // InsertBatch implements IUserStorage.
-func (u userStorage) InsertBatch(ctx context.Context, data []model.UserModel) error {
-	// Create a transaction
-	tx := u.table(u.tableName()).Begin()
-	if err := tx.Create(&data).Error; err != nil {
-		tx.Rollback()
-		fmt.Println("Error inserting records:", err)
-		return err
-	}
-	tx.Commit()
-	return nil
+func (u userStorage) InsertBatch(ctx context.Context, data *[]model.UserModel) error {
+	return u.CInsertBatch(ctx, CommonStorageParams{
+		TableName: u.tableName(),
+		Data:      data,
+	})
 }
 
-func (u userStorage) TxInsertMUsers(ctx context.Context, num int, data []model.UserModel) error {
+func (u userStorage) TxInsertMUsers(ctx context.Context, num int, data []*model.UserModel) error {
 	// Create a transaction
 	tx := u.db.Begin()
 	defer func() {

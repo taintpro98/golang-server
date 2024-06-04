@@ -60,7 +60,7 @@ func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 		if err != nil {
 			continue
 		}
-		var dataInsert []model.UserModel
+		var dataInsert []*model.UserModel
 		for _, item := range mUsers {
 			dataDB := model.UserModel{
 				ID:            item.UserID,
@@ -71,7 +71,7 @@ func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 			if item.Email != "" {
 				dataDB.Email = &item.Email
 			}
-			dataInsert = append(dataInsert, dataDB)
+			dataInsert = append(dataInsert, &dataDB)
 		}
 		err = processor.userStorage.TxInsertMUsers(ctx, num, dataInsert)
 		if err != nil {

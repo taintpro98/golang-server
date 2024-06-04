@@ -115,6 +115,29 @@ func (s commonStorage) CInsert(ctx context.Context, param CommonStorageParams) e
 	return tx.Error
 }
 
+func (s commonStorage) CInsertBatch(ctx context.Context, param CommonStorageParams) error {
+	s.log(ctx, "CInsertBatch", param)
+	// Create a transaction
+	tx := s.table(param.TableName).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Info(ctx, fmt.Sprintf("rollback CInsertBatch %s", param.TableName))
+			tx.Rollback()
+		}
+	}()
+	err := tx.Create(param.Data).Error // param.Data phai la con tro
+	if err != nil {
+		logger.Error(ctx, err, fmt.Sprintf("CInsertBatch %s error", param.TableName))
+		return err
+	}
+	err = tx.Commit().Error
+	if err != nil {
+		logger.Error(ctx, err, fmt.Sprintf("CInsertBatch %s Error when commit transaction", param.TableName))
+		return err
+	}
+	return nil
+}
+
 func (s commonStorage) CUpdateMany(ctx context.Context, param CommonStorageParams) error {
 	s.log(ctx, "CUpdateMany", param)
 
@@ -126,16 +149,7 @@ func (s commonStorage) CUpdateMany(ctx context.Context, param CommonStorageParam
 }
 
 func (s commonStorage) CDelete(ctx context.Context, param CommonStorageParams) error {
-	logger.Info(ctx, fmt.Sprintf("CDelete %s table", param.TableName), logger.LogField{
-		Key:   "data",
-		Value: param.Data,
-	}, logger.LogField{
-		Key:   "filter",
-		Value: param.Filter,
-	}, logger.LogField{
-		Key:   "common_filter",
-		Value: param.CommonFilter,
-	})
+	s.log(ctx, "CDelete", param)
 	tx := param.Query.Delete(param.Data)
 	if tx.Error != nil {
 		logger.Error(ctx, tx.Error, fmt.Sprintf("Failed to delete %s", param.TableName))

@@ -12,7 +12,7 @@ import (
 )
 
 type IElasticStorage interface {
-	IndexUsers(ctx context.Context, users []model.UserModel) error
+	IndexUsers(ctx context.Context, users []*model.UserModel) error
 	SearchUsers(ctx context.Context, name string) ([]model.UserModel, error)
 }
 
@@ -26,9 +26,9 @@ func NewElasticStorage(es *elasticsearch.Client) IElasticStorage {
 	}
 }
 
-func (s elasticStorage) IndexUsers(ctx context.Context, users []model.UserModel) error {
+func (s elasticStorage) IndexUsers(ctx context.Context, users []*model.UserModel) error {
 	for _, user := range users {
-		userJSON, err := json.Marshal(user)
+		userJSON, err := json.Marshal(*user)
 		if err != nil {
 			return err
 		}
