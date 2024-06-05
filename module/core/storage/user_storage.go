@@ -21,7 +21,7 @@ type IUserStorage interface {
 
 	InsertBatch(ctx context.Context, data *[]model.UserModel) error
 
-	TxInsertMUsers(ctx context.Context, num int, data []*model.UserModel) error
+	TxInsertMUsers(ctx context.Context, num int, data *[]model.UserModel) error
 }
 
 type userStorage struct {
@@ -93,7 +93,7 @@ func (u userStorage) InsertBatch(ctx context.Context, data *[]model.UserModel) e
 	})
 }
 
-func (u userStorage) TxInsertMUsers(ctx context.Context, num int, data []*model.UserModel) error {
+func (u userStorage) TxInsertMUsers(ctx context.Context, num int, data *[]model.UserModel) error {
 	// Create a transaction
 	tx := u.db.Begin()
 	defer func() {
@@ -105,7 +105,7 @@ func (u userStorage) TxInsertMUsers(ctx context.Context, num int, data []*model.
 			tx.Rollback()
 		}
 	}()
-	err := tx.Create(&data).Error
+	err := tx.Create(data).Error
 	if err != nil {
 		logger.Error(ctx, err, "TxInsertMUsers create users error")
 		return err

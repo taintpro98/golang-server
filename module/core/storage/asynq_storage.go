@@ -13,7 +13,7 @@ import (
 
 type IAsynqStorage interface {
 	AddToSyncUsersTask(ctx context.Context) error
-	AddToRegisterUserTask(ctx context.Context, data []*model.UserModel) error
+	AddToRegisterUserTask(ctx context.Context, data []model.UserModel) error
 }
 
 type asynqStorage struct {
@@ -46,7 +46,7 @@ func (s asynqStorage) AddToSyncUsersTask(ctx context.Context) error {
 	return err
 }
 
-func (s asynqStorage) AddToRegisterUserTask(ctx context.Context, data []*model.UserModel) error {
+func (s asynqStorage) AddToRegisterUserTask(ctx context.Context, data []model.UserModel) error {
 	taskAsynq, err := task.NewRegisterUserTask(ctx, s.cfg, data)
 	if err != nil {
 		logger.Error(ctx, err, "AddToRegisterUserTask could not create task")

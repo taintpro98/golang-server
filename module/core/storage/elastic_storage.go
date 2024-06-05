@@ -12,7 +12,7 @@ import (
 )
 
 type IElasticStorage interface {
-	IndexUsers(ctx context.Context, users []*model.UserModel) error
+	IndexUsers(ctx context.Context, users []model.UserModel) error
 	SearchUsers(ctx context.Context, name string) ([]model.UserModel, error)
 }
 
@@ -26,9 +26,9 @@ func NewElasticStorage(es *elasticsearch.Client) IElasticStorage {
 	}
 }
 
-func (s elasticStorage) IndexUsers(ctx context.Context, users []*model.UserModel) error {
+func (s elasticStorage) IndexUsers(ctx context.Context, users []model.UserModel) error {
 	for _, user := range users {
-		userJSON, err := json.Marshal(*user)
+		userJSON, err := json.Marshal(user)
 		if err != nil {
 			return err
 		}
@@ -51,11 +51,25 @@ func (s elasticStorage) IndexUsers(ctx context.Context, users []*model.UserModel
 	return nil
 }
 
-func (s elasticStorage) SearchUsers(ctx context.Context, name string) ([]model.UserModel, error) {
+type Test struct {
+}
+
+func (s elasticStorage) SearchUsers(ctx context.Context, search string) ([]model.UserModel, error) {
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
-			"match": map[string]interface{}{
-				"name": name,
+			"bool": map[string]interface{}{
+				"should": []map[string]interface{}{
+					{
+						"wildcard": map[string]interface{}{
+							"phone": fmt.Sprintf("*%s*", search),
+						},
+					},
+					{
+						"wildcard": map[string]interface{}{
+							"email": fmt.Sprintf("*%s*", search),
+						},
+					},
+				},
 			},
 		},
 	}

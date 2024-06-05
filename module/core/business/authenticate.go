@@ -28,7 +28,7 @@ func (b biz) Register(ctx context.Context, data dto.CreateUserRequest) (dto.Crea
 	}
 	response.Token = tokenString
 	// thong bao va day vao es (bat dong bo)
-	err = b.asynqStorage.AddToRegisterUserTask(ctx, []*model.UserModel{&userInsert})
+	err = b.asynqStorage.AddToRegisterUserTask(ctx, []model.UserModel{userInsert})
 	if err != nil {
 		logger.Error(ctx, err, "biz Register AddToRegisterUserTask error")
 	}

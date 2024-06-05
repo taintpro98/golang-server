@@ -66,8 +66,9 @@ func (s commonStorage) CFindOne(ctx context.Context, param CommonStorageParams) 
 	tx := param.Query.First(param.Data)
 	if tx.Error != nil && !errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		logger.Error(ctx, tx.Error, fmt.Sprintf("find one %s error", param.TableName))
+		return tx.Error
 	}
-	return tx.Error
+	return nil
 }
 
 func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) error {
@@ -97,8 +98,9 @@ func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) err
 			tx.Error,
 			fmt.Sprintf("list %s error", param.TableName),
 		)
+		return tx.Error
 	}
-	return tx.Error
+	return nil
 }
 
 func (s commonStorage) CInsert(ctx context.Context, param CommonStorageParams) error {

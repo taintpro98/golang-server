@@ -47,5 +47,5 @@ type CreateUserResponse struct {
 }
 
 type UserCreatedNotification struct {
-	Users []*model.UserModel `json:"users"`
+	Users []model.UserModel `json:"users"`
 }
