@@ -69,3 +69,6 @@ go run ./cmd/migration/main.go -dir seeds up
 ```
 k6 run k6/loadtest.js
 ```
+
+### References
+- [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)
