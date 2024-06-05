@@ -51,9 +51,6 @@ func (s elasticStorage) IndexUsers(ctx context.Context, users []model.UserModel)
 	return nil
 }
 
-type Test struct {
-}
-
 func (s elasticStorage) SearchUsers(ctx context.Context, search string) ([]model.UserModel, error) {
 	query := map[string]interface{}{
 		"query": map[string]interface{}{

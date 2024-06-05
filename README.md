@@ -65,3 +65,7 @@ go run ./cmd/migration/main.go -dir seeds up
     }
 }
 ```
+### Loadtest
+```
+k6 run k6/loadtest.js
+```
