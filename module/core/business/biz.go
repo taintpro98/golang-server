@@ -2,19 +2,19 @@ package business
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"golang-server/module/core/dto"
 	"golang-server/module/core/storage"
 	"golang-server/pkg/cache"
 	"golang-server/token"
-	"io"
-
-	"github.com/gin-gonic/gin"
 )
 
 type IBiz interface {
 	// user
 	// authenticate
 	Register(ctx context.Context, data dto.CreateUserRequest) (dto.CreateUserResponse, error)
+	Login(ctx context.Context, data dto.LoginRequest) (dto.CreateUserResponse, error)
 
 	//posts
 	CreatePost(ctx context.Context, userID string, data dto.CreatePostRequest) (dto.CreatePostResponse, error)
@@ -45,7 +45,7 @@ type IBiz interface {
 	AdminCreateRoom(ctx context.Context, data dto.AdminCreateRoomRequest) (dto.AdminCreateRoomResponse, error)
 
 	// sse
-	HandleEventStreamConnection(ctx context.Context, w io.Writer) (bool, error)
+	HandleEventStreamConnection(ctx context.Context, userID string) (*redis.PubSub, error)
 }
 
 type biz struct {

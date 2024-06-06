@@ -15,6 +15,8 @@ import (
 type IUserStorage interface {
 	Count(ctx context.Context, filter dto.FilterUser) (*int64, error)
 
+	FindOne(ctx context.Context, filter dto.FilterUser) (model.UserModel, error)
+
 	List(ctx context.Context, filter dto.FilterUser) ([]model.UserModel, error)
 
 	Insert(ctx context.Context, data *model.UserModel) error
@@ -63,6 +65,18 @@ func (u userStorage) Count(ctx context.Context, filter dto.FilterUser) (*int64, 
 		CommonFilter: filter.CommonFilter,
 		Query:        u.BuildQuery(filter),
 	})
+}
+
+func (u userStorage) FindOne(ctx context.Context, filter dto.FilterUser) (model.UserModel, error) {
+	var result model.UserModel
+	err := u.CFindOne(ctx, CommonStorageParams{
+		TableName:    u.tableName(),
+		Filter:       filter,
+		CommonFilter: filter.CommonFilter,
+		Query:        u.BuildQuery(filter),
+		Data:         &result,
+	})
+	return result, err
 }
 
 func (u userStorage) Insert(ctx context.Context, data *model.UserModel) error {

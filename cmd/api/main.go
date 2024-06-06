@@ -39,6 +39,10 @@ func main() {
 	if err != nil {
 		logger.Panic(ctx, err, "init redis cache error")
 	}
+	redisPubsub, err := cache.NewRedisClient(ctx, cnf.Redis)
+	if err != nil {
+		logger.Panic(ctx, err, "init redis pub sub error")
+	}
 	telegramBot, err := telegram.NewTelegramBot(cnf.TelegramBot)
 	if err != nil {
 		logger.Error(ctx, err, "init telegram bot error")
@@ -59,11 +63,6 @@ func main() {
 		logger.Panic(ctx, err, "init elastic connection error")
 	}
 
-	// create an asynq here to consume posts and send to real time newsfeed
-	//srv := queue.NewServer(cnf.RedisSSEQueue)
-	//
-	//mux := asynq.NewServeMux()
-
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(
@@ -72,7 +71,7 @@ func main() {
 	)
 
 	route.RegisterHealthCheckRoute(engine)
-	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, redisQueue, jwtMaker, es, telegramBot)
+	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, redisPubsub, redisQueue, jwtMaker, es, telegramBot)
 	server := http.Server{
 		Addr:    cnf.AppInfo.ApiPort,
 		Handler: engine,

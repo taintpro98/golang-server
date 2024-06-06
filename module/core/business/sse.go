@@ -2,11 +2,17 @@ package business
 
 import (
 	"context"
+	"fmt"
+	"github.com/redis/go-redis/v9"
+	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
-	"io"
 )
 
-func (b biz) HandleEventStreamConnection(ctx context.Context, w io.Writer) (bool, error) {
-	logger.Info(ctx, "biz HandleEventStreamConnection")
-	return false, nil
+func (b biz) HandleEventStreamConnection(ctx context.Context, userID string) (*redis.PubSub, error) {
+	logger.Info(ctx, "biz HandleEventStreamConnection", logger.LogField{
+		Key:   "userID",
+		Value: userID,
+	})
+	key := fmt.Sprintf("%s:%s", constants.PostsChannel, userID) // each user has a posts channel consuming all post
+	return b.redisClient.Subscribe(ctx, key)
 }

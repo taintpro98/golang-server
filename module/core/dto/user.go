@@ -49,3 +49,7 @@ type CreateUserResponse struct {
 type UserCreatedNotification struct {
 	Users []model.UserModel `json:"users"`
 }
+
+type LoginRequest struct {
+	Phone string `json:"phone"`
+}

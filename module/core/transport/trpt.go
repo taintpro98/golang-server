@@ -31,3 +31,13 @@ func (t *Transport) Register(ctx *gin.Context) {
 	result, err := t.biz.Register(ctx, data)
 	dto.HandleResponse(ctx, result, err)
 }
+
+func (t *Transport) Login(ctx *gin.Context) {
+	var data dto.LoginRequest
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		dto.HandleResponse(ctx, data, err)
+		return
+	}
+	result, err := t.biz.Login(ctx, data)
+	dto.HandleResponse(ctx, result, err)
+}

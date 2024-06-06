@@ -21,7 +21,7 @@ func Info(ctx context.Context, msg string, fields ...LogField) {
 	log.Info().Msg(msg)
 }
 
-func Error(ctx context.Context, err error, msg string) {
+func Error(ctx context.Context, err error, msg string, fields ...LogField) {
 	log.Error().Stack().Err(err).Msg(msg)
 }
 

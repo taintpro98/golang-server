@@ -1,9 +1,9 @@
 ### Features
-- Authenticaion using JWT
-- Realtime reserving seats concurrently using Redis, Postgresql
-- Realtime searching a lot of records using Elastic Search
-- Realtime newsfeed using SSE, Asynq (or Kafka)
-- Peer to peer messages using Websocket
+- [x] Authenticaion using JWT 
+- [x] Realtime reserving seats concurrently using Redis, Postgresql
+- [x] Realtime searching a lot of records using Elastic Search
+- [x] Realtime newsfeed using SSE, Redis Pub sub
+- [ ] Peer to peer messages using Websocket
 
 ### Technologies
 - Elastic Search
@@ -84,8 +84,9 @@ go run ./cmd/migration/main.go -dir seeds up
 k6 run k6/loadtest.js
 ```
 ### Server Sent Events
-- We can use Asynq or Kafka instead of channel to handle Server Sent Events, Kafka for microservices architecture ?
-- Because each user needs a particular channel to consume others post ? 
+- We can use Redis Pub Sub instead of channel to handle Server Sent Events (try Kafka ???)
+- Because each user needs a particular channel to consume others post
 
 ### References
 - [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)
+- [WebSockets vs Server-Sent-Events vs Long-Polling vs WebRTC vs WebTransport](https://rxdb.info/articles/websockets-sse-polling-webrtc-webtransport.html)

@@ -33,6 +33,10 @@ func NewWorkerDispatcher(
 	elasticStorage := storage.NewElasticStorage(es)
 	asynqStorage := storage.NewAsynqStorage(cnf.RedisQueue, redisQueue)
 
+	mux.Handle(task.CreatePostQueueName(cnf.RedisQueue.Prefix), processor.NewCreatePostProcessor(
+		redisClient,
+		userStorage,
+	))
 	mux.Handle(task.RegisterUserQueueName(cnf.RedisQueue.Prefix), processor.NewRegisterUserProcessor(
 		notificationStorage,
 		elasticStorage,

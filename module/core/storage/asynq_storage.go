@@ -14,6 +14,7 @@ import (
 type IAsynqStorage interface {
 	AddToSyncUsersTask(ctx context.Context) error
 	AddToRegisterUserTask(ctx context.Context, data []model.UserModel) error
+	AddToCreatePostTask(ctx context.Context, data model.PostModel) error
 }
 
 type asynqStorage struct {
@@ -31,17 +32,16 @@ func NewAsynqStorage(
 	}
 }
 
-// AddToSyncUsersTask implements IAsynqStorage.
-func (s asynqStorage) AddToSyncUsersTask(ctx context.Context) error {
-	taskAsynq, err := task.NewSyncUsersTask(ctx, s.cfg)
+func (s asynqStorage) AddToCreatePostTask(ctx context.Context, data model.PostModel) error {
+	taskAsynq, err := task.NewCreatePostTask(ctx, s.cfg, data)
 	if err != nil {
-		logger.Error(ctx, err, "AddToSyncUsersTask could not create task")
+		logger.Error(ctx, err, "AddToCreatePostTask could not create task")
 	}
 	info, err := s.redisQueue.Enqueue(taskAsynq)
 	if err != nil {
-		logger.Error(ctx, err, "AddToSyncUsersTask could not enqueue task")
+		logger.Error(ctx, err, "AddToCreatePostTask could not enqueue task")
 	} else {
-		logger.Info(ctx, fmt.Sprintf("enqueued AddToSyncUsersTask: id=%s queue=%s", info.ID, info.Queue))
+		logger.Info(ctx, fmt.Sprintf("enqueued AddToCreatePostTask: id=%s queue=%s", info.ID, info.Queue))
 	}
 	return err
 }
@@ -56,6 +56,21 @@ func (s asynqStorage) AddToRegisterUserTask(ctx context.Context, data []model.Us
 		logger.Error(ctx, err, "AddToRegisterUserTask could not enqueue task")
 	} else {
 		logger.Info(ctx, fmt.Sprintf("enqueued AddToRegisterUserTask: id=%s queue=%s", info.ID, info.Queue))
+	}
+	return err
+}
+
+// AddToSyncUsersTask implements IAsynqStorage.
+func (s asynqStorage) AddToSyncUsersTask(ctx context.Context) error {
+	taskAsynq, err := task.NewSyncUsersTask(ctx, s.cfg)
+	if err != nil {
+		logger.Error(ctx, err, "AddToSyncUsersTask could not create task")
+	}
+	info, err := s.redisQueue.Enqueue(taskAsynq)
+	if err != nil {
+		logger.Error(ctx, err, "AddToSyncUsersTask could not enqueue task")
+	} else {
+		logger.Info(ctx, fmt.Sprintf("enqueued AddToSyncUsersTask: id=%s queue=%s", info.ID, info.Queue))
 	}
 	return err
 }

@@ -13,13 +13,22 @@ func (b biz) CreatePost(ctx context.Context, userID string, data dto.CreatePostR
 		Value: data,
 	})
 	var response dto.CreatePostResponse
-	err := b.postStorage.Insert(ctx, &model.PostModel{
+	insertPost := model.PostModel{
 		UserID:  userID,
 		Title:   data.Title,
 		Content: data.Content,
-	})
+	}
+	err := b.postStorage.Insert(ctx, &insertPost)
 	if err != nil {
 		return response, err
+	}
+	response.ID = insertPost.ID
+	err = b.asynqStorage.AddToCreatePostTask(ctx, insertPost)
+	if err != nil {
+		logger.Error(ctx, err, "CreatePost AddToCreatePostTask", logger.LogField{
+			Key:   "insertpost",
+			Value: insertPost,
+		})
 	}
 	return response, nil
 }

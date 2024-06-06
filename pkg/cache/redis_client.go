@@ -14,7 +14,10 @@ import (
 
 type IRedisClient interface {
 	Get(ctx context.Context, key string, outputType interface{}) error
-	Set(ctx context.Context, key string, value interface{}, ttl int64) error // interface khong phai la con tro
+	Set(ctx context.Context, key string, value interface{}, ttl int64) error // interface is not a pointer
+
+	Publish(ctx context.Context, channel string, value interface{}) error // value is not a pointer
+	Subscribe(ctx context.Context, channel string) (*redis.PubSub, error)
 }
 
 type redisClient struct {
@@ -69,4 +72,22 @@ func (c *redisClient) Set(ctx context.Context, key string, value interface{}, se
 		ttl = time.Duration(seconds) * time.Second
 	}
 	return c.client.Set(ctx, c.generateKey(key), jsonBytes, ttl).Err()
+}
+
+func (c *redisClient) Publish(ctx context.Context, channel string, value interface{}) error {
+	jsonBytes, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return c.client.Publish(ctx, channel, jsonBytes).Err()
+}
+
+func (c *redisClient) Subscribe(ctx context.Context, channel string) (*redis.PubSub, error) {
+	pubsub := c.client.Subscribe(ctx, channel)
+	_, err := pubsub.Receive(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return pubsub, err
+	//return pubsub.Channel(), nil
 }

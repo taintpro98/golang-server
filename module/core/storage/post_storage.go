@@ -25,7 +25,7 @@ func NewPostStorage(cfg config.DatabaseConfig, db *gorm.DB) IPostStorage {
 }
 
 func (u postStorage) tableName() string {
-	return model.RoomModel{}.TableName()
+	return model.PostModel{}.TableName()
 }
 
 func (u postStorage) Insert(ctx context.Context, data *model.PostModel) error {

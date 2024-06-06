@@ -21,6 +21,7 @@ func RegisterRoutes(
 	cnf config.Config,
 	db *gorm.DB,
 	redisClient cache.IRedisClient,
+	redisPubsub cache.IRedisClient,
 	redisQueue *asynq.Client,
 	jwtMaker token.IJWTMaker,
 	es *elasticsearch.Client,
@@ -51,6 +52,7 @@ func RegisterRoutes(
 	// public api
 	publicApi := v1Api.Group("/public")
 	publicApi.POST("/register", trpt.Register)
+	publicApi.POST("/login", trpt.Login)
 
 	publicApi.Use(middleware.AuthMiddleware(jwtMaker))
 	{
