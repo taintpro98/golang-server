@@ -99,4 +99,9 @@ func RegisterRoutes(
 			roomApi.POST("", trpt.AdminCreateRoom)
 		}
 	}
+
+	// SSE
+	sseApi := e.Group("/sse")
+	sseApi.POST("/event-stream", trpt.HandleEventStreamPost)
+	sseApi.GET("/event-stream", trpt.HandleEventStreamGet)
 }

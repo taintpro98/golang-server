@@ -9,13 +9,16 @@ import (
 
 type Transport struct {
 	biz business.IBiz
+	ch  chan string
 }
 
 func NewTransport(
 	biz business.IBiz,
 ) *Transport {
+	ch := make(chan string)
 	return &Transport{
 		biz: biz,
+		ch:  ch,
 	}
 }
 

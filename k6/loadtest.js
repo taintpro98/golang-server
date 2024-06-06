@@ -27,7 +27,7 @@ export default function (data) {
     const getResponseData = JSON.parse(getResponse.body).data
     const randomSeat = Math.floor(Math.random() * getResponseData.seats.length);
     const postBody = {
-      seat_id: randomSeat.seat_id
+      seat_id: getResponseData.seats[randomSeat].seat_id
     }
     const postResponse = http.post(`http://localhost:5000/v1/public/slots/${slotID}`, JSON.stringify(postBody), { headers });
     if (postResponse.status === 200) {
