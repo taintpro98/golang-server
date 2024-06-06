@@ -59,6 +59,11 @@ func main() {
 		logger.Panic(ctx, err, "init elastic connection error")
 	}
 
+	// create an asynq here to consume posts and send to real time newsfeed
+	//srv := queue.NewServer(cnf.RedisSSEQueue)
+	//
+	//mux := asynq.NewServeMux()
+
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(

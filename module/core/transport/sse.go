@@ -27,3 +27,13 @@ func (t *Transport) HandleEventStreamGet(ctx *gin.Context) {
 		return false
 	})
 }
+
+func (t *Transport) CreateEventStreamConnection(ctx *gin.Context) {
+	ctx.Stream(func(w io.Writer) bool {
+		if msg, ok := <-t.ch; ok {
+			ctx.SSEvent("message", msg)
+			return true
+		}
+		return false
+	})
+}

@@ -1,16 +1,24 @@
-### Note
-- Elastic Search
-- Big Query 
-- Kafka
-
-curl http://localhost:3000/health
-
 ### Features
-- Reserving seats concurrently using Redis, Postgresql
+- Authenticaion using JWT
+- Realtime reserving seats concurrently using Redis, Postgresql
 - Realtime searching a lot of records using Elastic Search
-- Realtime posts using SSE, Kafka
+- Realtime newsfeed using SSE, Asynq (or Kafka)
 - Peer to peer messages using Websocket
-- 
+
+### Technologies
+- Elastic Search
+- Big Query
+- Kafka
+### Ingredients
+- API and SSE server using Gin
+- Event dispatcher consuming Kafka Events
+- Cron Jobs
+- Workers using Asynq with Redis
+- Websocket server using ...
+### Health check
+```
+curl http://localhost:5000/health
+```
 ### Docker
 - Remove containers not in the file docker-compose.dev.yml
   ```
@@ -76,7 +84,8 @@ go run ./cmd/migration/main.go -dir seeds up
 k6 run k6/loadtest.js
 ```
 ### Server Sent Events
-- We can use Kafka instead of channel to handle Server Sent Events
+- We can use Asynq or Kafka instead of channel to handle Server Sent Events, Kafka for microservices architecture ?
+- Because each user needs a particular channel to consume others post ? 
 
 ### References
 - [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)

@@ -41,6 +41,7 @@ func RegisterRoutes(
 		storage.NewSlotSeatStorage(cnf.Database, db, redisClient),
 		storage.NewOrderStorage(cnf.Database, db),
 		storage.NewConstantStorage(cnf.Database, db),
+		storage.NewPostStorage(cnf.Database, db),
 	)
 	trpt := transport.NewTransport(biz)
 
@@ -68,6 +69,17 @@ func RegisterRoutes(
 		orderApi := publicApi.Group("/orders")
 		{
 			orderApi.POST("", trpt.CreateOrder)
+		}
+
+		postApi := publicApi.Group("/posts")
+		{
+			postApi.POST("", trpt.CreatePost)
+		}
+
+		// sse
+		sseApi := publicApi.Group("/sse")
+		{
+			sseApi.GET("/newsfeed", trpt.CreateEventStreamConnection)
 		}
 	}
 
@@ -100,7 +112,7 @@ func RegisterRoutes(
 		}
 	}
 
-	// SSE
+	// SSE Prototype
 	sseApi := e.Group("/sse")
 	sseApi.POST("/event-stream", trpt.HandleEventStreamPost)
 	sseApi.GET("/event-stream", trpt.HandleEventStreamGet)

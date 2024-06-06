@@ -6,6 +6,7 @@ import (
 	"golang-server/module/core/storage"
 	"golang-server/pkg/cache"
 	"golang-server/token"
+	"io"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,9 @@ type IBiz interface {
 	// user
 	// authenticate
 	Register(ctx context.Context, data dto.CreateUserRequest) (dto.CreateUserResponse, error)
+
+	//posts
+	CreatePost(ctx context.Context, userID string, data dto.CreatePostRequest) (dto.CreatePostResponse, error)
 
 	//slots
 	GetMovieSlotInfo(ctx context.Context, slotID string) (dto.GetMovieSlotInfoResponse, error)
@@ -39,6 +43,9 @@ type IBiz interface {
 
 	//rooms
 	AdminCreateRoom(ctx context.Context, data dto.AdminCreateRoomRequest) (dto.AdminCreateRoomResponse, error)
+
+	// sse
+	HandleEventStreamConnection(ctx context.Context, w io.Writer) (bool, error)
 }
 
 type biz struct {
@@ -55,6 +62,7 @@ type biz struct {
 	slotSeatStorage     storage.ISlotSeatStorage
 	orderStorage        storage.IOrderStorage
 	constantStorage     storage.IConstantStorage
+	postStorage         storage.IPostStorage
 }
 
 func NewBiz(
@@ -71,6 +79,7 @@ func NewBiz(
 	slotSeatStorage storage.ISlotSeatStorage,
 	orderStorage storage.IOrderStorage,
 	constantStorage storage.IConstantStorage,
+	postStorage storage.IPostStorage,
 ) IBiz {
 	return biz{
 		jwtMaker:            jwtMaker,
@@ -86,5 +95,6 @@ func NewBiz(
 		slotSeatStorage:     slotSeatStorage,
 		orderStorage:        orderStorage,
 		constantStorage:     constantStorage,
+		postStorage:         postStorage,
 	}
 }

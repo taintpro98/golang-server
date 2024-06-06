@@ -16,15 +16,16 @@ import (
 const KEY_CONFIG_URL = "--config_url"
 
 type Config struct {
-	AppInfo     ConfigAppInfo    `mapstructure:"app_info"`
-	DBM         DatabaseConfig   `mapstructure:"dbm"`
-	Database    DatabaseConfig   `mapstructure:"database"`
-	Redis       RedisConfig      `mapstructure:"redis"`
-	RedisQueue  RedisQueueConfig `mapstructure:"redis_queue"`
-	Kafka       KafkaConfig      `mapstructure:"kafka"`
-	TelegramBot TelegramBot      `mapstructure:"telegram_bot"`
-	Token       Token            `mapstructure:"token"`
-	Elastic     ElasticConfig    `mapstructure:"elastic"`
+	AppInfo       ConfigAppInfo    `mapstructure:"app_info"`
+	DBM           DatabaseConfig   `mapstructure:"dbm"`
+	Database      DatabaseConfig   `mapstructure:"database"`
+	Redis         RedisConfig      `mapstructure:"redis"`
+	RedisQueue    RedisQueueConfig `mapstructure:"redis_queue"`
+	RedisSSEQueue RedisQueueConfig `mapstructure:"redis_queue"`
+	Kafka         KafkaConfig      `mapstructure:"kafka"`
+	TelegramBot   TelegramBot      `mapstructure:"telegram_bot"`
+	Token         Token            `mapstructure:"token"`
+	Elastic       ElasticConfig    `mapstructure:"elastic"`
 }
 
 type KafkaConfig struct {
