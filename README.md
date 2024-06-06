@@ -5,6 +5,12 @@
 
 curl http://localhost:3000/health
 
+### Features
+- Reserving seats concurrently using Redis, Postgresql
+- Realtime searching a lot of records using Elastic Search
+- Realtime posts using SSE, Kafka
+- Peer to peer messages using Websocket
+- 
 ### Docker
 - Remove containers not in the file docker-compose.dev.yml
   ```
@@ -69,6 +75,8 @@ go run ./cmd/migration/main.go -dir seeds up
 ```
 k6 run k6/loadtest.js
 ```
+### Server Sent Events
+- We can use Kafka instead of channel to handle Server Sent Events
 
 ### References
 - [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)

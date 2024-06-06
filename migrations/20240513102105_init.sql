@@ -95,6 +95,18 @@ create table public.slot_seats(
     "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE IF EXISTS public.posts;
+
+CREATE TABLE public.posts (
+    id uuid DEFAULT uuid_generate_v4() primary key,
+    title text not null,
+    content text not null,
+    user_id uuid not null,
+    "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE UNIQUE INDEX slot_seats_slot_id_seat_id_u_idx ON public.slot_seats(slot_id, seat_id);
 
 CREATE INDEX orders_user_id_idx ON public.orders (user_id);
