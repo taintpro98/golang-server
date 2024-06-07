@@ -31,6 +31,10 @@ func main() {
 	if err != nil {
 		logger.Panic(ctx, err, "init redis cache error")
 	}
+	redisPubsub, err := cache.NewRedisClient(ctx, cnf.Redis)
+	if err != nil {
+		logger.Panic(ctx, err, "init redis pub sub error")
+	}
 	telegramBot, err := telegram.NewTelegramBot(cnf.TelegramBot)
 	if err != nil {
 		logger.Error(ctx, err, "init telegram bot error")
@@ -50,7 +54,7 @@ func main() {
 
 	// mux maps a type to a handler
 	mux := asynq.NewServeMux()
-	worker.NewWorkerDispatcher(ctx, cnf, redisClient, es, postgresqlDB, mDB, mux, redisQueue, telegramBot)
+	worker.NewWorkerDispatcher(ctx, cnf, redisClient, redisPubsub, es, postgresqlDB, mDB, mux, redisQueue, telegramBot)
 
 	if err := srv.Run(mux); err != nil {
 		log.Fatalf("could not run server: %v", err)

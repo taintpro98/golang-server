@@ -31,6 +31,7 @@ func RegisterRoutes(
 	biz := business.NewBiz(
 		jwtMaker,
 		redisClient,
+		redisPubsub,
 		storage.NewElasticStorage(es),
 		storage.NewAsynqStorage(cnf.RedisQueue, redisQueue),
 		storage.NewUserStorage(cnf.Database, db),

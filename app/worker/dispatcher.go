@@ -19,6 +19,7 @@ func NewWorkerDispatcher(
 	ctx context.Context,
 	cnf config.Config,
 	redisClient cache.IRedisClient,
+	redisPubsub cache.IRedisClient,
 	es *elasticsearch.Client,
 	db *gorm.DB,
 	mDb *gorm.DB,
@@ -34,7 +35,7 @@ func NewWorkerDispatcher(
 	asynqStorage := storage.NewAsynqStorage(cnf.RedisQueue, redisQueue)
 
 	mux.Handle(task.CreatePostQueueName(cnf.RedisQueue.Prefix), processor.NewCreatePostProcessor(
-		redisClient,
+		redisPubsub,
 		userStorage,
 	))
 	mux.Handle(task.RegisterUserQueueName(cnf.RedisQueue.Prefix), processor.NewRegisterUserProcessor(

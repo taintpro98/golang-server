@@ -59,8 +59,9 @@ type RedisConfig struct {
 }
 
 type ConfigAppInfo struct {
-	Environment string `mapstructure:"environment"`
-	ApiPort     string `mapstructure:"api_port"`
+	Environment   string `mapstructure:"environment"`
+	ApiPort       string `mapstructure:"api_port"`
+	WebsocketPort string `mapstructure:"websocket_port"`
 }
 
 type DatabaseConfig struct {

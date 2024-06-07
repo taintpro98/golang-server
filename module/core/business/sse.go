@@ -14,5 +14,5 @@ func (b biz) HandleEventStreamConnection(ctx context.Context, userID string) (*r
 		Value: userID,
 	})
 	key := fmt.Sprintf("%s:%s", constants.PostsChannel, userID) // each user has a posts channel consuming all post
-	return b.redisClient.Subscribe(ctx, key)
+	return b.redisPubsub.Subscribe(ctx, key)
 }

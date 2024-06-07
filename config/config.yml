@@ -3,6 +3,7 @@ enable_swagger: true
 app_info:
   environment: development
   api_port: :5000
+  websocket_port: :5001
 
 database:
   schema: public

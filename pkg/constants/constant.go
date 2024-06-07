@@ -15,7 +15,8 @@ const (
 	FindByIDSlotKey  = "find_by_id_slot_key"
 	ListCacheSlotKey = "list_cache_slot_key"
 
-	PostsChannel = "posts_channel"
+	PostsChannel    = "posts_channel"
+	MessagesChannel = "messages_channel"
 )
 
 type GolangServerConstant string

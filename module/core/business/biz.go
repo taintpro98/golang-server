@@ -51,6 +51,7 @@ type IBiz interface {
 type biz struct {
 	jwtMaker            token.IJWTMaker
 	redisClient         cache.IRedisClient
+	redisPubsub         cache.IRedisClient
 	elasticStorage      storage.IElasticStorage
 	asynqStorage        storage.IAsynqStorage
 	userStorage         storage.IUserStorage
@@ -68,6 +69,7 @@ type biz struct {
 func NewBiz(
 	jwtMaker token.IJWTMaker,
 	redisClient cache.IRedisClient,
+	redisPubsub cache.IRedisClient,
 	elasticStorage storage.IElasticStorage,
 	asynqStorage storage.IAsynqStorage,
 	userStorage storage.IUserStorage,
@@ -86,6 +88,7 @@ func NewBiz(
 		elasticStorage:      elasticStorage,
 		asynqStorage:        asynqStorage,
 		redisClient:         redisClient,
+		redisPubsub:         redisPubsub,
 		userStorage:         userStorage,
 		movieStorage:        movieStorage,
 		slotStorage:         slotStorage,

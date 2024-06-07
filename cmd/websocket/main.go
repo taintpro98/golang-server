@@ -1,45 +1,69 @@
 package main
 
 import (
-	"log"
+	"context"
+	"errors"
+	"flag"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"golang-server/config"
+	"golang-server/pkg/cache"
+	"golang-server/pkg/logger"
+	"golang-server/route"
+	"golang-server/token"
 	"net/http"
-
-	"github.com/gorilla/websocket"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("Upgrade error:", err)
-		return
-	}
-	defer conn.Close()
-
-	for {
-		// Đọc thông điệp từ client
-		_, msg, err := conn.ReadMessage()
-		if err != nil {
-			log.Println("Read error:", err)
-			break
-		}
-
-		// In ra thông điệp từ client
-		log.Printf("Received: %s\n", msg)
-
-		// Gửi lại thông điệp cho client
-		if err := conn.WriteMessage(websocket.TextMessage, msg); err != nil {
-			log.Println("Write error:", err)
-			break
-		}
-	}
-}
-
 func main() {
-	http.HandleFunc("/ws", wsHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	logger.InitLogger("websocket-service")
+	envi := flag.String("e", "", "Environment option")
+	flag.Parse()
+	cnf := config.Init(*envi)
+	ctx := context.Background()
+
+	jwtMaker, err := token.NewJWTMaker(ctx, cnf.Token)
+	if err != nil {
+		logger.Panic(ctx, err, "init token maker error")
+	}
+	redisPubsub, err := cache.NewRedisClient(ctx, cnf.Redis)
+	if err != nil {
+		logger.Panic(ctx, err, "init redis pub sub error")
+	}
+
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+
+	route.RegisterWebsocketRoutes(engine, cnf, jwtMaker, redisPubsub)
+
+	server := http.Server{
+		Addr:    cnf.AppInfo.WebsocketPort,
+		Handler: engine,
+	}
+
+	go func() {
+		logger.Info(ctx, fmt.Sprintf("Running Websocket on port %s...", cnf.AppInfo.WebsocketPort))
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Error(ctx, err, "Run websocket error")
+		}
+	}()
+	// Đợi tín hiệu tắt từ hệ thống hoặc từ người dùng
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	logger.Info(ctx, "Shutting down websocket server...")
+
+	// Tạo một context để thông báo cho server biết rằng nó cần shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Thực hiện graceful shutdown cho server
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Error(ctx, err, "Error shutting down server")
+	} else {
+		logger.Info(ctx, "Server shutdown complete.")
+	}
 }

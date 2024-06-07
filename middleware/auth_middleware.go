@@ -9,15 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type WebsocketSecureParam struct {
+	Token string `form:"token,omitempty"`
+}
+
+func readToken(c *gin.Context) (string, error) {
+	authHeader := c.GetHeader("Authorization")
+	bearLength := len("Bearer ")
+	if len(authHeader) < bearLength {
+		var ws WebsocketSecureParam
+		if err := c.ShouldBindQuery(&ws); err != nil {
+			return "", e.ErrUnauthorized
+		}
+		return ws.Token, nil
+	}
+	return authHeader[bearLength:], nil
+}
+
 func AuthMiddleware(jwtMaker token.IJWTMaker) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		bearLength := len("Bearer ")
-		if len(authHeader) < bearLength {
-			dto.AbortJSON(c, e.ErrUnauthorized)
+		tokenString, err := readToken(c)
+		if err != nil {
+			dto.AbortJSON(c, err)
 			return
 		}
-		tokenString := authHeader[bearLength:]
 		payload, err := jwtMaker.VerifyToken(c, tokenString)
 		if err != nil {
 			dto.AbortJSON(c, e.ErrUnauthorized)

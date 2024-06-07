@@ -15,16 +15,16 @@ import (
 )
 
 type CreatePostProcessor struct {
-	redisClient cache.IRedisClient
+	redisPubsub cache.IRedisClient
 	userStorage storage.IUserStorage
 }
 
 func NewCreatePostProcessor(
-	redisClient cache.IRedisClient,
+	redisPubsub cache.IRedisClient,
 	userStorage storage.IUserStorage,
 ) *CreatePostProcessor {
 	return &CreatePostProcessor{
-		redisClient: redisClient,
+		redisPubsub: redisPubsub,
 		userStorage: userStorage,
 	}
 }
@@ -45,7 +45,7 @@ func (processor *CreatePostProcessor) ProcessTask(ctx context.Context, t *asynq.
 	})
 	for _, item := range friends {
 		channel := fmt.Sprintf("%s:%s", constants.PostsChannel, item.ID)
-		err := processor.redisClient.Publish(ctx, channel, data)
+		err := processor.redisPubsub.Publish(ctx, channel, data)
 		if err != nil {
 			logger.Error(ctx, err, "CreatePostProcessor Publish error", logger.LogField{
 				Key:   "data",
