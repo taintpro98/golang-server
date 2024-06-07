@@ -19,8 +19,8 @@ func NewWsTransport(
 	}
 }
 
-func (t WsTransport) CreateNotificationConnection(ctx *gin.Context) {
+func (t WsTransport) CreateMsgConnection(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.XUserID).(string)
-	err := t.biz.CreateNotificationConnection(ctx, userID)
+	err := t.biz.CreateMsgConnection(ctx, userID)
 	dto.HandleResponse(ctx, nil, err)
 }

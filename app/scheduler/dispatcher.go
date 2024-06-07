@@ -29,7 +29,7 @@ func NewSchedulerDispatcher(
 				if isRunning {
 					return
 				}
-				C := logger.SetupLogger(ctx, "scheduler sync users")
+				C := logger.SetupLogger(ctx, "scheduler sync users", nil)
 				isRunning = true
 				err := handler.Handle(C)
 				if err != nil {

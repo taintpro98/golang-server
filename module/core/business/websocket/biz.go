@@ -13,7 +13,7 @@ import (
 )
 
 type IWsBusiness interface {
-	CreateNotificationConnection(ctx *gin.Context, userID string) error
+	CreateMsgConnection(ctx *gin.Context, userID string) error
 }
 
 type wsBusiness struct {
@@ -31,7 +31,7 @@ func NewWsBusiness(
 	}
 }
 
-func (w wsBusiness) CreateNotificationConnection(ctx *gin.Context, userID string) error {
+func (w wsBusiness) CreateMsgConnection(ctx *gin.Context, userID string) error {
 	var err error
 	conn, err := w.upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {

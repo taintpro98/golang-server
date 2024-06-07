@@ -33,5 +33,5 @@ func RegisterWebsocketRoutes(
 
 	wsApi.Use(middleware.AuthMiddleware(jwtMaker))
 
-	wsApi.GET("/msg", trpt.CreateNotificationConnection)
+	wsApi.GET("/msg", trpt.CreateMsgConnection)
 }

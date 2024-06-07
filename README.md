@@ -6,9 +6,11 @@
 - [x] Peer to peer messages using Websocket, Redis Pub sub
 
 ### Technologies
-- Elastic Search
-- Big Query
-- Kafka
+- [x] Postgresql
+- [x] Elastic Search
+- [ ] Kafka
+- [ ] Big Query
+- [ ] MongoDB
 ### Ingredients
 - API, SSE and Websocket server using Gin
 - Event dispatcher consuming Kafka Events
@@ -100,8 +102,14 @@ node client/socket.js 0
 ```
 node client/socket.js 1
 ```
+- Do I need Mongo to make messages storage ?
+### Kafka
+- [Dashboard](http://localhost:8000/)
+- Consumer, Consumer Group, Broker, Partition, Offset, Topic
 
 ### References
 - [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)
 - [WebSockets vs Server-Sent-Events vs Long-Polling vs WebRTC vs WebTransport](https://rxdb.info/articles/websockets-sse-polling-webrtc-webtransport.html)
 - [Building WebSocket for Notifications with GoLang and Gin: A Detailed Guide](https://medium.com/@abhishekranjandev/building-a-production-grade-websocket-for-notifications-with-golang-and-gin-a-detailed-guide-5b676dcfbd5a)
+- [Apache Kafka zero to one](https://viblo.asia/s/apache-kafka-tu-zero-den-one-aGK7jPbA5j2)
+- [Kafka docker compose](https://medium.com/@tetianaokhotnik/docker-compose-for-kafka-single-broker-in-kraft-mode-kafka-ui-and-confluent-rest-proxy-7334da721d4c)
