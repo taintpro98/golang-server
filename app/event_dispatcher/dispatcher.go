@@ -1,0 +1,5 @@
+package eventdispatcher
+
+func NewEventDispatcher() {
+
+}

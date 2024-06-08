@@ -37,7 +37,8 @@ type KafkaConfig struct {
 }
 
 type KafkaTopic struct {
-	UserTopic string `mapstructure:"user_topic"`
+	UserTopic      string `mapstructure:"user_topic"`
+	MessageChannel string `mapstructure:"message_channel"`
 }
 
 type RedisQueueConfig struct {

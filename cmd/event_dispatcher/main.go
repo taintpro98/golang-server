@@ -7,7 +7,6 @@ import (
 	"golang-server/config"
 	"golang-server/pkg/kafka"
 	"golang-server/pkg/logger"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,13 +15,7 @@ import (
 	"github.com/IBM/sarama"
 )
 
-func main() {
-	logger.InitLogger("event-dispatcher-service")
-	envi := flag.String("e", "", "Environment option")
-	flag.Parse()
-	cnf := config.Init(*envi)
-	ctx := context.Background()
-
+func runKafkaConsumer(ctx context.Context, cnf config.Config) {
 	client, err := kafka.NewConsumer(ctx, cnf.Kafka)
 	if err != nil {
 		logger.Panic(ctx, err, "init consumer error")
@@ -32,10 +25,11 @@ func main() {
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
 	// Bắt đầu tiêu thụ từ topic "test-topic"
-	consumer, err := client.ConsumePartition("user-topic", 0, sarama.OffsetOldest)
+	consumer, err := client.ConsumePartition(cnf.Kafka.Topic.MessageChannel, 0, sarama.OffsetOldest)
 	if err != nil {
-		log.Fatalln("Failed to start consumer for partition 0:", err)
+		logger.Error(ctx, err, "Failed to start consumer for partition 0")
 	}
+	defer consumer.Close()
 
 	// Tiêu thụ các tin nhắn trong một goroutine
 	go func() {
@@ -64,4 +58,16 @@ func main() {
 	} else {
 		logger.Info(ctx, "Consumer shutdown complete.")
 	}
+}
+
+// consumer group
+
+func main() {
+	logger.InitLogger("event-dispatcher-service")
+	envi := flag.String("e", "", "Environment option")
+	flag.Parse()
+	cnf := config.Init(*envi)
+	ctx := context.Background()
+
+	runKafkaConsumer(ctx, cnf)
 }
