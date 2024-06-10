@@ -3,13 +3,14 @@ package wsbusiness
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"golang-server/module/core/dto"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
-	"net/http"
+	"sync"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type IWsBusiness interface {
@@ -19,6 +20,7 @@ type IWsBusiness interface {
 type wsBusiness struct {
 	upgrader    websocket.Upgrader
 	redisPubsub cache.IRedisClient
+	clients     sync.Map
 }
 
 func NewWsBusiness(
@@ -28,50 +30,105 @@ func NewWsBusiness(
 	return wsBusiness{
 		upgrader:    upgrader,
 		redisPubsub: redisPubsub,
+		clients:     sync.Map{},
 	}
 }
 
 func (w wsBusiness) CreateMsgConnection(ctx *gin.Context, userID string) error {
-	var err error
 	conn, err := w.upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		logger.Error(ctx, err, "create ws connection error", logger.LogField{
+			Key:   "user id",
+			Value: userID,
+		})
 		return err
 	}
 
 	receiveChannel := fmt.Sprintf("%s:%s", constants.MessagesChannel, userID)
-	pubsub, err := w.redisPubsub.Subscribe(ctx, receiveChannel)
+	pubsub, err := w.redisPubsub.Subscribe(ctx, receiveChannel) // kenh de user lang nghe tin nhan den
+	if err != nil {
+		logger.Error(ctx, err, "create redis pubsub error", logger.LogField{
+			Key:   "user id",
+			Value: userID,
+		})
+		conn.Close()
+		return err
+	}
 
+	client := &dto.Client{
+		UserID: userID,
+		Conn:   conn,
+		Pubsub: pubsub,
+	}
+	w.clients.Store(userID, client)
+
+	defer func() {
+		conn.Close()
+		pubsub.Close()
+		w.clients.Delete(client.UserID)
+	}()
+
+	go w.HandleReceiveMessages(ctx, client)
+	go w.HandleSendMessages(ctx, client)
+
+	logger.Info(ctx, "wsBusiness close message connection")
+	return nil
+}
+
+func (w wsBusiness) HandleSendMessages(ctx *gin.Context, client *dto.Client) {
 	for {
 		// Đọc tin nhắn từ client
-		_, sendMsg, err := conn.ReadMessage()
+		_, sendMsg, err := client.Conn.ReadMessage()
 		if err != nil {
-			break
-		}
-		var message dto.SendMessageRequest
-		err = json.Unmarshal(sendMsg, &message)
-
-		// Xử lý tin nhắn từ client
-		sendChannal := fmt.Sprintf("%s:%s", constants.MessagesChannel, message.UserID)
-		err = w.redisPubsub.Publish(ctx, sendChannal, message.Content)
-		if err != nil {
-			logger.Error(ctx, err, "send message error", logger.LogField{
-				Key:   "message",
-				Value: message,
-			}, logger.LogField{
-				Key:   "sender",
-				Value: userID,
+			logger.Error(ctx, err, "ws read messages error", logger.LogField{
+				Key:   "user",
+				Value: client.UserID,
 			})
 			break
 		}
+		var messageRequest dto.SendMessageRequest
+		err = json.Unmarshal(sendMsg, &messageRequest)
+		if err != nil {
+			logger.Error(ctx, err, "unmarshal messageRequest error")
+		}
 
+		// Xử lý tin nhắn từ client
+		sendChannel := fmt.Sprintf("%s:%s", constants.MessagesChannel, messageRequest.UserID)
+
+		messageData := dto.MessageData{
+			FromUserID: client.UserID,
+			ToUserID:   messageRequest.UserID,
+			Content:    messageRequest.Content,
+		}
+		logger.Info(ctx, "send messsages", logger.LogField{
+			Key:   "messageData",
+			Value: messageData,
+		})
+		err = w.redisPubsub.Publish(ctx, sendChannel, messageData)
+		if err != nil {
+			logger.Error(ctx, err, "send messageData error", logger.LogField{
+				Key:   "messageData",
+				Value: messageData,
+			})
+			break
+		}
+	}
+}
+
+func (w wsBusiness) HandleReceiveMessages(ctx *gin.Context, client *dto.Client) {
+	for {
 		// Gửi tin nhắn từ server đến client
-		receiveMsg, err := pubsub.ReceiveMessage(ctx.Request.Context())
-		err = conn.WriteMessage(websocket.TextMessage, []byte(receiveMsg.Payload))
+		receiveMsg, err := client.Pubsub.ReceiveMessage(ctx.Request.Context())
+		if err != nil {
+			logger.Error(ctx, err, "pubsub receive messages error", logger.LogField{
+				Key:   "user",
+				Value: client.UserID,
+			})
+			break
+		}
+		err = client.Conn.WriteMessage(websocket.TextMessage, []byte(receiveMsg.Payload))
 		if err != nil {
 			break
 		}
 	}
-	logger.Error(ctx, err, "wsBusiness CreateNotificationConnection")
-	return conn.Close()
 }

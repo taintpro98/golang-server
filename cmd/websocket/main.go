@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"golang-server/config"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/logger"
@@ -16,6 +15,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -33,11 +34,26 @@ func main() {
 	if err != nil {
 		logger.Panic(ctx, err, "init redis pub sub error")
 	}
+	// kafkaProducer, err := kafka.NewProducer(cnf.Kafka)
+	// if err != nil {
+	// 	logger.Panic(ctx, err, "init kafka producer error")
+	// }
+	// kafkaConsumerGroup, err := kafka.NewConsumerGroup(cnf.Kafka)
+	// if err != nil {
+	// 	logger.Panic(ctx, err, "init kafka consumer group error")
+	// }
 
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 
-	route.RegisterWebsocketRoutes(engine, cnf, jwtMaker, redisPubsub)
+	route.RegisterWebsocketRoutes(
+		engine,
+		cnf,
+		jwtMaker,
+		redisPubsub,
+		// kafkaProducer,
+		// kafkaConsumerGroup,
+	)
 
 	server := http.Server{
 		Addr:    cnf.AppInfo.WebsocketPort,
