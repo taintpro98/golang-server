@@ -4,11 +4,12 @@
 - [x] Realtime searching a lot of records using Elastic Search
 - [x] Realtime newsfeed using SSE, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Redis Pub sub
+- [x] Peer to peer messages using Websocket, Kafka
 
 ### Technologies
 - [x] Postgresql
 - [x] Elastic Search
-- [ ] Kafka
+- [x] Kafka
 - [ ] Big Query
 - [ ] MongoDB
 - [ ] RabbitMQ
