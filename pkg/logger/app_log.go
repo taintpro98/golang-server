@@ -32,3 +32,7 @@ func SetupLogger(c context.Context, serviceName string, data interface{}) contex
 	})
 	return ctx
 }
+
+func SetupKafkaConsumerLogger() context.Context {
+	return context.Background()
+}

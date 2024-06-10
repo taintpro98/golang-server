@@ -7,15 +7,18 @@ import (
 	"fmt"
 	"golang-server/config"
 	"golang-server/pkg/cache"
+	"golang-server/pkg/kafka"
 	"golang-server/pkg/logger"
 	"golang-server/route"
 	"golang-server/token"
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
+	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,6 +29,8 @@ func main() {
 	cnf := config.Init(*envi)
 	ctx := context.Background()
 
+	clients := sync.Map{}
+
 	jwtMaker, err := token.NewJWTMaker(ctx, cnf.Token)
 	if err != nil {
 		logger.Panic(ctx, err, "init token maker error")
@@ -34,36 +39,57 @@ func main() {
 	if err != nil {
 		logger.Panic(ctx, err, "init redis pub sub error")
 	}
-	// kafkaProducer, err := kafka.NewProducer(cnf.Kafka)
-	// if err != nil {
-	// 	logger.Panic(ctx, err, "init kafka producer error")
-	// }
-	// kafkaConsumerGroup, err := kafka.NewConsumerGroup(cnf.Kafka)
-	// if err != nil {
-	// 	logger.Panic(ctx, err, "init kafka consumer group error")
-	// }
+	kafkaProducer, err := kafka.NewProducer(cnf.Kafka)
+	if err != nil {
+		logger.Panic(ctx, err, "init kafka producer error")
+	}
+	kafkaConsumerGroup, err := kafka.NewConsumerGroup(cnf.Kafka)
+	if err != nil {
+		logger.Panic(ctx, err, "init kafka consumer group error")
+	}
 
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 
+	handler := route.ConsumerGroupHandler{}
+
 	route.RegisterWebsocketRoutes(
 		engine,
+		&handler,
 		cnf,
+		&clients,
 		jwtMaker,
 		redisPubsub,
-		// kafkaProducer,
-		// kafkaConsumerGroup,
+		kafkaProducer,
+		kafkaConsumerGroup,
 	)
 
 	server := http.Server{
 		Addr:    cnf.AppInfo.WebsocketPort,
 		Handler: engine,
 	}
-
 	go func() {
 		logger.Info(ctx, fmt.Sprintf("Running Websocket on port %s...", cnf.AppInfo.WebsocketPort))
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Error(ctx, err, "Run websocket error")
+		}
+	}()
+
+	topics := []string{
+		cnf.Kafka.Topic.MessageChannel,
+	}
+	go func() {
+		// `Consume` should be called inside an infinite loop, when a
+		// server-side rebalance happens, the consumer session will need to be
+		// recreated to get the new claims
+		logger.Info(ctx, "Running message consumer group...")
+		for {
+			if err := kafkaConsumerGroup.Consume(ctx, topics, &handler); err != nil {
+				if errors.Is(err, sarama.ErrClosedConsumerGroup) {
+					return
+				}
+				logger.Panic(ctx, err, "consumer group error")
+			}
 		}
 	}()
 	// Đợi tín hiệu tắt từ hệ thống hoặc từ người dùng
@@ -77,9 +103,13 @@ func main() {
 	defer cancel()
 
 	// Thực hiện graceful shutdown cho server
-	if err := server.Shutdown(ctx); err != nil {
+	err = server.Shutdown(ctx)
+	if err != nil {
 		logger.Error(ctx, err, "Error shutting down server")
-	} else {
-		logger.Info(ctx, "Server shutdown complete.")
 	}
+	err = kafkaConsumerGroup.Close()
+	if err != nil {
+		logger.Error(ctx, err, "Error shutting down consumer group")
+	}
+	logger.Info(ctx, "Server shutdown complete.")
 }

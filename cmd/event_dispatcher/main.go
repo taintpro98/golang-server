@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"golang-server/config"
@@ -61,6 +62,63 @@ func runKafkaConsumer(ctx context.Context, cnf config.Config) {
 }
 
 // consumer group
+type ConsumerGroupHandler struct{}
+
+func (ConsumerGroupHandler) Setup(_ sarama.ConsumerGroupSession) error   { return nil }
+func (ConsumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error { return nil }
+func (h ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	fmt.Printf("xxxx")
+	for {
+		select {
+		case message, ok := <-claim.Messages():
+			if !ok {
+				return nil
+			}
+			fmt.Println("message", message.Value)
+
+			session.MarkMessage(message, "")
+		case <-session.Context().Done():
+			return nil
+		}
+	}
+}
+
+func runKafkaConsumerGroup(ctx context.Context, cnf config.Config) {
+	consumerGroup, err := kafka.NewConsumerGroup(cnf.Kafka)
+	if err != nil {
+		logger.Panic(ctx, err, "Error creating consumer group")
+	}
+	defer consumerGroup.Close()
+
+	topics := []string{
+		cnf.Kafka.Topic.MessageChannel,
+	}
+
+	handler := ConsumerGroupHandler{}
+
+	go func() {
+		logger.Info(ctx, "Running consumer group...")
+		for {
+			if err := consumerGroup.Consume(ctx, topics, &handler); err != nil {
+				if errors.Is(err, sarama.ErrClosedConsumerGroup) {
+					return
+				}
+				logger.Panic(ctx, err, "consumer group error")
+			}
+		}
+	}()
+
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	<-signals
+	logger.Info(ctx, "Shutting down consumer group ...")
+
+	if err = consumerGroup.Close(); err != nil {
+		logger.Error(ctx, err, "Error shutting down consumer group")
+	} else {
+		logger.Info(ctx, "Consumer group shutdown completely")
+	}
+}
 
 func main() {
 	logger.InitLogger("event-dispatcher-service")
@@ -69,5 +127,5 @@ func main() {
 	cnf := config.Init(*envi)
 	ctx := context.Background()
 
-	runKafkaConsumer(ctx, cnf)
+	runKafkaConsumerGroup(ctx, cnf)
 }

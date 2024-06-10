@@ -1,36 +1,49 @@
 package wsbusiness
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"golang-server/module/core/dto"
+	"golang-server/module/core/storage"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
 	"sync"
 
+	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 type IWsBusiness interface {
 	CreateMsgConnection(ctx *gin.Context, userID string) error
+	CreateMsgKafkaConnection(ctx *gin.Context, userID string) error
+
+	HandleReceiveKafkaMessage(ctx context.Context, message dto.MessageData) error
 }
 
 type wsBusiness struct {
-	upgrader    websocket.Upgrader
-	redisPubsub cache.IRedisClient
-	clients     sync.Map
+	clients            *sync.Map
+	upgrader           websocket.Upgrader
+	redisPubsub        cache.IRedisClient
+	kafkaConsumerGroup sarama.ConsumerGroup
+	kafkaStorage       storage.IKafkaStorage
 }
 
 func NewWsBusiness(
+	clients *sync.Map,
 	upgrader websocket.Upgrader,
 	redisPubsub cache.IRedisClient,
+	kafkaConsumerGroup sarama.ConsumerGroup,
+	kafkaStorage storage.IKafkaStorage,
 ) IWsBusiness {
 	return wsBusiness{
-		upgrader:    upgrader,
-		redisPubsub: redisPubsub,
-		clients:     sync.Map{},
+		upgrader:           upgrader,
+		redisPubsub:        redisPubsub,
+		clients:            clients,
+		kafkaConsumerGroup: kafkaConsumerGroup,
+		kafkaStorage:       kafkaStorage,
 	}
 }
 
@@ -62,20 +75,18 @@ func (w wsBusiness) CreateMsgConnection(ctx *gin.Context, userID string) error {
 	}
 	w.clients.Store(userID, client)
 
-	defer func() {
-		conn.Close()
-		pubsub.Close()
-		w.clients.Delete(client.UserID)
-	}()
-
 	go w.HandleReceiveMessages(ctx, client)
 	go w.HandleSendMessages(ctx, client)
-
-	logger.Info(ctx, "wsBusiness close message connection")
 	return nil
 }
 
 func (w wsBusiness) HandleSendMessages(ctx *gin.Context, client *dto.Client) {
+	defer func() {
+		client.Conn.Close()
+		client.Pubsub.Close()
+		w.clients.Delete(client.UserID)
+	}()
+
 	for {
 		// Đọc tin nhắn từ client
 		_, sendMsg, err := client.Conn.ReadMessage()
