@@ -14,7 +14,7 @@
 - [ ] RabbitMQ
 - [ ] Minikube
 ### Technique
-= [ ] Partition
+- [ ] Partition
 ### Ingredients
 - API, SSE and Websocket server using Gin
 - Event dispatcher consuming Kafka Events
