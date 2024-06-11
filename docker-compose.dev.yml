@@ -18,6 +18,18 @@ services:
     networks:
       - golang-server-network
 
+  mongo:
+    image: mongo:latest
+    container_name: mongo-golang-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+      MONGO_INITDB_DATABASE: golang-database
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./docker/mongo-data:/data/db
+
   redis:
     container_name: golang-redis
     image: redis:latest
@@ -34,4 +46,6 @@ networks:
 
 volumes:
   golang-database:
+    driver: local
+  mongo-database:
     driver: local

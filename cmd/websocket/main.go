@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"golang-server/config"
 	"golang-server/pkg/cache"
+	"golang-server/pkg/database"
 	"golang-server/pkg/kafka"
 	"golang-server/pkg/logger"
 	"golang-server/route"
@@ -46,6 +47,10 @@ func main() {
 	kafkaConsumerGroup, err := kafka.NewConsumerGroup(cnf.Kafka)
 	if err != nil {
 		logger.Panic(ctx, err, "init kafka consumer group error")
+	}
+	mongoDB, err := database.NewMongoDatabase(ctx, cnf.Mongo)
+	if err != nil {
+		logger.Panic(ctx, err, "init mongo db error")
 	}
 
 	gin.SetMode(gin.ReleaseMode)
@@ -111,5 +116,7 @@ func main() {
 	if err != nil {
 		logger.Error(ctx, err, "Error shutting down consumer group")
 	}
+
+	mongoDB.Disconnect(ctx)
 	logger.Info(ctx, "Server shutdown complete.")
 }

@@ -21,3 +21,5 @@ secrets
 cmd/test.go
 
 docker/redis-data/dump.rdb
+docker/mongo-data/*
+!docker/mongo-data/.gitkeep

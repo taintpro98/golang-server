@@ -19,6 +19,7 @@ type Config struct {
 	AppInfo     ConfigAppInfo    `mapstructure:"app_info"`
 	DBM         DatabaseConfig   `mapstructure:"dbm"`
 	Database    DatabaseConfig   `mapstructure:"database"`
+	Mongo       MongoConfig      `mapstructure:"mongo"`
 	Redis       RedisConfig      `mapstructure:"redis"`
 	RedisPubSub RedisConfig      `mapstructure:"redis_pub_sub"`
 	RedisQueue  RedisQueueConfig `mapstructure:"redis_queue"`
@@ -73,6 +74,13 @@ type DatabaseConfig struct {
 	Password     string `mapstructure:"password"`
 	DatabaseName string `mapstructure:"database_name"`
 	SSLMode      string `mapstructure:"sslmode"`
+}
+
+type MongoConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
 }
 
 type TelegramBot struct {

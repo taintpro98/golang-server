@@ -5,6 +5,7 @@
 - [x] Realtime newsfeed using SSE, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Kafka
+- [ ] Messages storage using MongoDB
 
 ### Technologies
 - [x] Postgresql
@@ -15,7 +16,8 @@
 - [ ] RabbitMQ
 - [ ] Minikube
 ### Technique
-- [ ] Partition
+- [ ] Database partition
+- [ ] Token decentralization
 ### Ingredients
 - API, SSE and Websocket server using Gin
 - Event dispatcher consuming Kafka Events
