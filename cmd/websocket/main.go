@@ -66,6 +66,7 @@ func main() {
 		jwtMaker,
 		redisPubsub,
 		kafkaProducer,
+		mongoDB,
 		// kafkaConsumerGroup,
 	)
 

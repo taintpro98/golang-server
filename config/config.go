@@ -77,10 +77,11 @@ type DatabaseConfig struct {
 }
 
 type MongoConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
+	DatabaseName string `mapstructure:"database_name"`
+	Host         string `mapstructure:"host"`
+	Port         string `mapstructure:"port"`
+	Username     string `mapstructure:"username"`
+	Password     string `mapstructure:"password"`
 }
 
 type TelegramBot struct {

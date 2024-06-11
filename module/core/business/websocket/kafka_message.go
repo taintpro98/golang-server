@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"golang-server/module/core/dto"
+	"golang-server/module/core/model/mgmodel"
 	"golang-server/pkg/logger"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -60,6 +62,19 @@ func (w wsBusiness) HandleSendKafkaMessages(ctx *gin.Context, client *dto.Client
 			Key:   "messageData",
 			Value: messageData,
 		})
+
+		// save message
+		err = w.mgMsgStorage.Insert(ctx, &mgmodel.Message{
+			SenderID:   messageData.FromUserID,
+			ReceiverID: messageData.ToUserID,
+			Content:    messageData.Content,
+			Timestamp:  time.Now(),
+		})
+		if err != nil {
+			break
+		}
+
+		// send to kafka
 		err = w.kafkaStorage.SendMessage(ctx, messageData)
 		if err != nil {
 			logger.Error(ctx, err, "send kafka messageData error", logger.LogField{

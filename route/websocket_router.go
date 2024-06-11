@@ -5,6 +5,7 @@ import (
 	"golang-server/middleware"
 	wsbusiness "golang-server/module/core/business/websocket"
 	"golang-server/module/core/storage"
+	mgstorage "golang-server/module/core/storage/mongo"
 	wstransport "golang-server/module/core/transport/websocket"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/logger"
@@ -14,6 +15,7 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ConsumerGroupHandler struct {
@@ -51,20 +53,20 @@ func RegisterWebsocketRoutes(
 	jwtMaker token.IJWTMaker,
 	redisPubsub cache.IRedisClient,
 	kafkaProducer sarama.SyncProducer,
+	mongoDB *mongo.Client,
 	// kafkaConsumerGroup sarama.ConsumerGroup,
 ) {
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
-	kafkaStorage := storage.NewKafkaStorage(cnf.Kafka.Topic, kafkaProducer)
 
 	biz := wsbusiness.NewWsBusiness(
 		clients,
 		upgrader,
 		redisPubsub,
-		// kafkaConsumerGroup,
-		kafkaStorage,
+		storage.NewKafkaStorage(cnf.Kafka.Topic, kafkaProducer),
+		mgstorage.NewMessageStorage(cnf.Mongo, mongoDB),
 	)
 	trpt := wstransport.NewWsTransport(biz)
 

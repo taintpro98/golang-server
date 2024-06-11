@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang-server/module/core/dto"
 	"golang-server/module/core/storage"
+	mgstorage "golang-server/module/core/storage/mongo"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
@@ -28,6 +29,7 @@ type wsBusiness struct {
 	redisPubsub cache.IRedisClient
 	// kafkaConsumerGroup sarama.ConsumerGroup
 	kafkaStorage storage.IKafkaStorage
+	mgMsgStorage mgstorage.IMessageStorage
 }
 
 func NewWsBusiness(
@@ -36,6 +38,7 @@ func NewWsBusiness(
 	redisPubsub cache.IRedisClient,
 	// kafkaConsumerGroup sarama.ConsumerGroup,
 	kafkaStorage storage.IKafkaStorage,
+	mgMsgStorage mgstorage.IMessageStorage,
 ) IWsBusiness {
 	return wsBusiness{
 		upgrader:    upgrader,
@@ -43,6 +46,7 @@ func NewWsBusiness(
 		clients:     clients,
 		// kafkaConsumerGroup: kafkaConsumerGroup,
 		kafkaStorage: kafkaStorage,
+		mgMsgStorage: mgMsgStorage,
 	}
 }
 
