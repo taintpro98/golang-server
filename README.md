@@ -1,3 +1,6 @@
+1. [Overview](#overview)
+2. [Features](#features)
+
 ### Features
 - [x] Authenticaion using JWT 
 - [x] Realtime reserving seats concurrently using Redis, Postgresql
@@ -6,6 +9,7 @@
 - [x] Peer to peer messages using Websocket, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Kafka
 - [x] Messages storage using MongoDB
+- [ ] Blockchain interaction
 
 ### Technologies
 - [x] Postgresql
@@ -18,6 +22,7 @@
 ### Technique
 - [ ] Database partition
 - [ ] Token decentralization
+- [ ] Stored Procedure
 ### Ingredients
 - API, SSE and Websocket server using Gin
 - Event dispatcher consuming Kafka Events
@@ -114,12 +119,15 @@ node client/socket.js 1
 - [Dashboard](http://localhost:8080/)
 - Consumer, Consumer Group, Broker, Partition, Offset, Topic
 
+### Database partition
+<!-- ![Database partition](images/partition.png) -->
+<img src="images/partition.png" alt="Database partition" width="300" height="200">
+
 ### References
 - [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)
 - [WebSockets vs Server-Sent-Events vs Long-Polling vs WebRTC vs WebTransport](https://rxdb.info/articles/websockets-sse-polling-webrtc-webtransport.html)
 - [Building WebSocket for Notifications with GoLang and Gin: A Detailed Guide](https://medium.com/@abhishekranjandev/building-a-production-grade-websocket-for-notifications-with-golang-and-gin-a-detailed-guide-5b676dcfbd5a)
 - [Apache Kafka zero to one](https://viblo.asia/s/apache-kafka-tu-zero-den-one-aGK7jPbA5j2)
-- [Kafka docker compose](https://medium.com/@tetianaokhotnik/docker-compose-for-kafka-single-broker-in-kraft-mode-kafka-ui-and-confluent-rest-proxy-7334da721d4c)
 - [Performance optimization với PostgreSQL](https://viblo.asia/s/performance-optimization-voi-postgresql-OVlYq8oal8W)
 - [[Kafka] 1.Cài Đặt Kafka Server Trong 1 Phút](https://viblo.asia/p/kafka-1cai-dat-kafka-server-trong-1-phut-38X4E63XJN2)
 - [Building An SSH Chatroom With Go](https://medium.com/@alexfoleydevops/building-an-ssh-chatroom-with-go-6df65facd6cb)
