@@ -11,7 +11,6 @@ import (
 	"golang-server/pkg/logger"
 	"sync"
 
-	"github.com/IBM/sarama"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -24,26 +23,26 @@ type IWsBusiness interface {
 }
 
 type wsBusiness struct {
-	clients            *sync.Map
-	upgrader           websocket.Upgrader
-	redisPubsub        cache.IRedisClient
-	kafkaConsumerGroup sarama.ConsumerGroup
-	kafkaStorage       storage.IKafkaStorage
+	clients     *sync.Map
+	upgrader    websocket.Upgrader
+	redisPubsub cache.IRedisClient
+	// kafkaConsumerGroup sarama.ConsumerGroup
+	kafkaStorage storage.IKafkaStorage
 }
 
 func NewWsBusiness(
 	clients *sync.Map,
 	upgrader websocket.Upgrader,
 	redisPubsub cache.IRedisClient,
-	kafkaConsumerGroup sarama.ConsumerGroup,
+	// kafkaConsumerGroup sarama.ConsumerGroup,
 	kafkaStorage storage.IKafkaStorage,
 ) IWsBusiness {
 	return wsBusiness{
-		upgrader:           upgrader,
-		redisPubsub:        redisPubsub,
-		clients:            clients,
-		kafkaConsumerGroup: kafkaConsumerGroup,
-		kafkaStorage:       kafkaStorage,
+		upgrader:    upgrader,
+		redisPubsub: redisPubsub,
+		clients:     clients,
+		// kafkaConsumerGroup: kafkaConsumerGroup,
+		kafkaStorage: kafkaStorage,
 	}
 }
 

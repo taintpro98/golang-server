@@ -61,7 +61,7 @@ func main() {
 		jwtMaker,
 		redisPubsub,
 		kafkaProducer,
-		kafkaConsumerGroup,
+		// kafkaConsumerGroup,
 	)
 
 	server := http.Server{

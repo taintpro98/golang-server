@@ -51,7 +51,7 @@ func RegisterWebsocketRoutes(
 	jwtMaker token.IJWTMaker,
 	redisPubsub cache.IRedisClient,
 	kafkaProducer sarama.SyncProducer,
-	kafkaConsumerGroup sarama.ConsumerGroup,
+	// kafkaConsumerGroup sarama.ConsumerGroup,
 ) {
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -63,7 +63,7 @@ func RegisterWebsocketRoutes(
 		clients,
 		upgrader,
 		redisPubsub,
-		kafkaConsumerGroup,
+		// kafkaConsumerGroup,
 		kafkaStorage,
 	)
 	trpt := wstransport.NewWsTransport(biz)
