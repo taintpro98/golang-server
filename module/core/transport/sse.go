@@ -1,11 +1,12 @@
 package transport
 
 import (
-	"github.com/gin-gonic/gin"
 	"golang-server/module/core/dto"
 	"golang-server/pkg/constants"
 	"io"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SSEWriter is a custom io.Writer for sending SSE data
@@ -55,11 +56,11 @@ func (t *Transport) HandleEventStreamGet(ctx *gin.Context) {
 func (t *Transport) CreateEventStreamConnection(ctx *gin.Context) {
 	userID := ctx.MustGet(constants.XUserID).(string)
 
-	pubsub, err := t.biz.HandleEventStreamConnection(ctx, userID)
-	if err != nil {
-		dto.HandleResponse(ctx, nil, err)
-		return
-	}
+	pubsub := t.biz.HandleEventStreamConnection(ctx, userID)
+	// if err != nil {
+	// 	dto.HandleResponse(ctx, nil, err)
+	// 	return
+	// }
 	defer pubsub.Close()
 	// Set headers for SSE
 	ctx.Header("Content-Type", "text/event-stream")

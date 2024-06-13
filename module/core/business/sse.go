@@ -3,12 +3,13 @@ package business
 import (
 	"context"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"golang-server/pkg/constants"
 	"golang-server/pkg/logger"
+
+	"github.com/redis/go-redis/v9"
 )
 
-func (b biz) HandleEventStreamConnection(ctx context.Context, userID string) (*redis.PubSub, error) {
+func (b biz) HandleEventStreamConnection(ctx context.Context, userID string) *redis.PubSub {
 	logger.Info(ctx, "biz HandleEventStreamConnection", logger.LogField{
 		Key:   "userID",
 		Value: userID,

@@ -67,6 +67,8 @@ func (processor *SyncUsersProcessor) ProcessTask(ctx context.Context, t *asynq.T
 				LoyaltyID:     item.LoyaltyID,
 				Phone:         item.Phone,
 				CurOriginalID: item.CurOriginalID,
+				CreatedAt:     &item.CreatedAt,
+				UpdatedAt:     &item.UpdatedAt,
 			}
 			if item.Email != "" {
 				dataDB.Email = &item.Email

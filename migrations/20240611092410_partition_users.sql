@@ -3,39 +3,30 @@
 SELECT
   'up SQL query';
 
-CREATE TABLE IF NOT EXISTS public."hail_driver_location" (
-  "id" bigserial,
-  "driver_id" uuid NOT NULL,
-  "order_id" TEXT NOT NULL,
-  "lat" FLOAT NOT NULL,
-  "lng" FLOAT NOT NULL,
-  "time" timestamp NOT NULL,
-  "time_delta" int NOT NULL,
-  "speed" FLOAT,
-  "speed_acc" FLOAT,
-  "bearing" FLOAT,
-  "bearing_acc" FLOAT,
-  "horizontal_acc" FLOAT,
-  "vertical_acc" FLOAT,
-  "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) PARTITION BY RANGE(time);
+create table public.users (
+  id uuid DEFAULT uuid_generate_v4() primary key,
+  "loyalty_id" int NULL,
+  "email" varchar NULL,
+  "phone" varchar NOT NULL,
+  "cur_original_id" varchar NULL,
+  "created_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) partition by range(created_at);
 
-CREATE INDEX IF NOT EXISTS hail_driver_location_idx ON public.hail_driver_location (driver_id, order_id, time);
+CREATE UNIQUE INDEX IF NOT EXISTS users_phone_u_idx ON public.users USING HASH (phone);
+
+CREATE UNIQUE INDEX IF NOT EXISTS users_loyalty_id_u_idx ON public.users USING HASH (loyalty_id);
 
 -- Creating a function to generate partition tables dynamically
 CREATE
-OR REPLACE FUNCTION create_partitions(start_date DATE, end_date DATE) RETURNS VOID AS $ $ DECLARE curr_date DATE := start_date;
+OR REPLACE FUNCTION create_users_partition(start_date DATE, end_date DATE) RETURNS VOID AS $ $ DECLARE curr_date DATE := start_date;
 
 BEGIN WHILE curr_date < end_date LOOP EXECUTE format(
-  '
-            CREATE TABLE IF NOT EXISTS public."hail_driver_location_%s" PARTITION OF public."hail_driver_location"
-            FOR VALUES FROM (%L) TO (%L);',
-  to_char(curr_date, 'YYYYMMDD'),
+  'CREATE TABLE IF NOT EXISTS public."users_%s" PARTITION OF public.users FOR VALUES FROM (%L) TO (%L)',
+  to_char(curr_date, 'YYYYMMMM'),
   curr_date,
-  curr_date + INTERVAL '1 day'
+  curr_date + INTERVAL '1 month'
 );
-
-curr_date := curr_date + INTERVAL '1 day';
 
 END LOOP;
 
@@ -44,7 +35,7 @@ END;
 $ $ LANGUAGE plpgsql;
 
 SELECT
-  create_partitions('2024-03-01' :: DATE, '2025-01-01' :: DATE);
+  create_users_partition('2024-03-01' :: DATE, '2025-01-01' :: DATE);
 
 -- +goose StatementEnd
 -- +goose Down
@@ -52,6 +43,6 @@ SELECT
 SELECT
   'down SQL query';
 
-DROP TABLE IF EXISTS hail_driver_location;
+DROP TABLE IF EXISTS users;
 
 -- +goose StatementEnd

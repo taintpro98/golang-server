@@ -57,6 +57,12 @@ go run ./cmd/migration/main.go -dir migrations up
 go run ./cmd/migration/main.go -dir seeds create ${FILE_NAME} sql
 go run ./cmd/migration/main.go -dir seeds up
 ```
+#### Partition
+- Vertical vs horizontal
+- By hash vs by list
+- Cron create partition
+#### Materialized view
+- Caching in database layer 
 
 ### Elastic search
 - [Dashboard](http://localhost:5601/)

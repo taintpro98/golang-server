@@ -12,7 +12,7 @@ const users = [
 const args = process.argv.slice(2);
 curUser = Number(args[0]);
 otherUser = 1 - curUser;
-const socket = new WebSocket(`ws://localhost:5001/v1/ws/msgkafka?token=${users[curUser].token}`);
+const socket = new WebSocket(`ws://localhost:5001/v1/ws/msg?token=${users[curUser].token}`);
 // const socket = new WebSocket(`ws://localhost:5001/v1/ws/msg?token=${users[curUser].token}`);
 
 socket.onopen = () => {

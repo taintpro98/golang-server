@@ -61,15 +61,15 @@ func (w wsBusiness) CreateMsgConnection(ctx *gin.Context, userID string) error {
 	}
 
 	receiveChannel := fmt.Sprintf("%s:%s", constants.MessagesChannel, userID)
-	pubsub, err := w.redisPubsub.Subscribe(ctx, receiveChannel) // kenh de user lang nghe tin nhan den
-	if err != nil {
-		logger.Error(ctx, err, "create redis pubsub error", logger.LogField{
-			Key:   "user id",
-			Value: userID,
-		})
-		conn.Close()
-		return err
-	}
+	pubsub := w.redisPubsub.Subscribe(ctx, receiveChannel) // kenh de user lang nghe tin nhan den
+	// if err != nil {
+	// 	logger.Error(ctx, err, "create redis pubsub error", logger.LogField{
+	// 		Key:   "user id",
+	// 		Value: userID,
+	// 	})
+	// 	conn.Close()
+	// 	return err
+	// }
 
 	client := &dto.Client{
 		UserID: userID,
