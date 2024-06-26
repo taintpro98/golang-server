@@ -69,6 +69,12 @@ func main() {
 		middleware.LogRequestInfo(),
 		gin.Recovery(),
 	)
+	engine.Static("/static", "./static")
+
+	// Route chính hiển thị form upload
+	engine.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "upload.html", nil)
+	})
 
 	route.RegisterHealthCheckRoute(engine)
 	route.RegisterRoutes(engine, cnf, postgresqlDB, redisClient, redisPubsub, redisQueue, jwtMaker, es, telegramBot)

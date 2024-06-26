@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  golang-server:
+    build:
+      context: .
+      dockerfile: cmd/api/Dockerfile
+    image: gcr.io/YOUR_PROJECT_ID/golang-server
+    environment:
+      - PORT=5000
+      - EXAMPLE_VAR=example_value

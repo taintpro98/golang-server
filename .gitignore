@@ -13,8 +13,6 @@ node_modules/
 
 **/config.*.yml
 
-docker-compose.yml
-
 .env
 app.env
 secrets
@@ -23,3 +21,5 @@ cmd/test.go
 docker/redis-data/dump.rdb
 docker/mongo-data/*
 !docker/mongo-data/.gitkeep
+
+bin/

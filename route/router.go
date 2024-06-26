@@ -17,7 +17,7 @@ import (
 )
 
 func RegisterRoutes(
-	e *gin.Engine,
+	engine *gin.Engine,
 	cnf config.Config,
 	db *gorm.DB,
 	redisClient cache.IRedisClient,
@@ -47,8 +47,9 @@ func RegisterRoutes(
 	)
 	trpt := transport.NewTransport(biz)
 
+	engine.POST("/upload", trpt.Upload)
 	// routes
-	v1Api := e.Group("/v1")
+	v1Api := engine.Group("/v1")
 
 	// public api
 	publicApi := v1Api.Group("/public")
@@ -116,7 +117,7 @@ func RegisterRoutes(
 	}
 
 	// SSE Prototype
-	sseApi := e.Group("/sse")
+	sseApi := engine.Group("/sse")
 	sseApi.POST("/event-stream", trpt.HandleEventStreamPost)
 	sseApi.GET("/event-stream", trpt.HandleEventStreamGet)
 }

@@ -9,6 +9,7 @@
 - [x] Peer to peer messages using Websocket, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Kafka
 - [x] Messages storage using MongoDB
+- [x] File uploads
 - [ ] Blockchain interaction
 
 ### Technologies
@@ -16,6 +17,7 @@
 - [x] Elastic Search
 - [x] Kafka
 - [x] MongoDB
+- [ ] Google Cloud Platform deployment
 - [ ] Big Query
 - [ ] RabbitMQ
 - [ ] Minikube
@@ -128,6 +130,12 @@ node client/socket.js 1
 ### Database partition
 <!-- ![Database partition](images/partition.png) -->
 <img src="images/partition.png" alt="Database partition" width="300" height="200">
+
+### Deployment
+- Build go program to binary file
+```
+go build -o bin/api cmd/api/main.go
+```
 
 ### References
 - [Streaming Server-Sent Events With Go](https://pascalallen.medium.com/streaming-server-sent-events-with-go-8cc1f615d561)
