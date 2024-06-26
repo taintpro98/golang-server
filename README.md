@@ -4,7 +4,7 @@
 ### Features
 - [x] Authenticaion using JWT 
 - [x] Realtime reserving seats concurrently using Redis, Postgresql
-- [x] Realtime searching a lot of records using Elastic Search
+- [x] Realtime searching millions of records using Elastic Search
 - [x] Realtime newsfeed using SSE, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Redis Pub sub
 - [x] Peer to peer messages using Websocket, Kafka
