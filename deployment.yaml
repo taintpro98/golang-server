@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-server-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: golang-server-app
+  template:
+    metadata:
+      labels:
+        app: golang-server-app
+    spec:
+      containers:
+      - name: golang-server-app
+        image: golang-server-app:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: golang-server-app-service
+spec:
+  selector:
+    app: golang-server-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort
