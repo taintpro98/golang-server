@@ -18,7 +18,7 @@ FROM alpine:3.18
 RUN mkdir -p /app/config
 
 COPY --from=builder /app/cmd/api/api /app/
-COPY ./config/config.yml /app/config/config.yml
+COPY ./config/config.mn.yml /app/config/config.yml
 
 ENV ENV_CONFIG_ONLY=true
 

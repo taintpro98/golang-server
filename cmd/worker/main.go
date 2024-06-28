@@ -29,11 +29,11 @@ func main() {
 	}
 	redisClient, err := cache.NewRedisClient(ctx, cnf.Redis)
 	if err != nil {
-		logger.Panic(ctx, err, "init redis cache error")
+		logger.Error(ctx, err, "init redis cache error")
 	}
 	redisPubsub, err := cache.NewRedisClient(ctx, cnf.Redis)
 	if err != nil {
-		logger.Panic(ctx, err, "init redis pub sub error")
+		logger.Error(ctx, err, "init redis pub sub error")
 	}
 	telegramBot, err := telegram.NewTelegramBot(cnf.TelegramBot)
 	if err != nil {
@@ -45,7 +45,7 @@ func main() {
 	}
 	es, err := elastic.New(ctx, &cnf.Elastic)
 	if err != nil {
-		logger.Panic(ctx, err, "init elastic connection error")
+		logger.Error(ctx, err, "init elastic connection error")
 	}
 	redisQueue := queue.NewClient(cnf.RedisQueue)
 	defer redisQueue.Close()

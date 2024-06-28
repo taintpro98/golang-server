@@ -34,23 +34,23 @@ func main() {
 
 	jwtMaker, err := token.NewJWTMaker(ctx, cnf.Token)
 	if err != nil {
-		logger.Panic(ctx, err, "init token maker error")
+		logger.Error(ctx, err, "init token maker error")
 	}
 	redisPubsub, err := cache.NewRedisClient(ctx, cnf.Redis)
 	if err != nil {
-		logger.Panic(ctx, err, "init redis pub sub error")
+		logger.Error(ctx, err, "init redis pub sub error")
 	}
 	kafkaProducer, err := kafka.NewProducer(cnf.Kafka)
 	if err != nil {
-		logger.Panic(ctx, err, "init kafka producer error")
+		logger.Error(ctx, err, "init kafka producer error")
 	}
 	kafkaConsumerGroup, err := kafka.NewConsumerGroup(cnf.Kafka)
 	if err != nil {
-		logger.Panic(ctx, err, "init kafka consumer group error")
+		logger.Error(ctx, err, "init kafka consumer group error")
 	}
 	mongoDB, err := database.NewMongoDatabase(ctx, cnf.Mongo)
 	if err != nil {
-		logger.Panic(ctx, err, "init mongo db error")
+		logger.Error(ctx, err, "init mongo db error")
 	}
 
 	gin.SetMode(gin.ReleaseMode)

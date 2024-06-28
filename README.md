@@ -131,6 +131,21 @@ node client/socket.js 1
 <!-- ![Database partition](images/partition.png) -->
 <img src="images/partition.png" alt="Database partition" width="300" height="200">
 
+### Minikube
+- Minikube
+```
+mn start
+eval $(minikube docker-env)
+```
+- Containerize app to an image
+```
+docker build -t golang-server-app:latest .
+```
+- Deploy
+```
+k apply -f minikube/db-deployment.yaml
+k apply -f minikube/deployment.yaml
+```
 ### Deployment
 - Build go program to binary file
 ```

@@ -15,6 +15,7 @@ spec:
       containers:
       - name: golang-server-app
         image: golang-server-app:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
 ---
