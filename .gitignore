@@ -3,6 +3,8 @@
 .idea
 
 node_modules/
+uploads/*.jpg
+uploads/*.png
 
 **/gin-bin
 **/gin-bin.exe
