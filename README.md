@@ -10,6 +10,7 @@
 - [x] Peer to peer messages using Websocket, Kafka
 - [x] Messages storage using MongoDB
 - [x] File uploads
+- [ ] GraphQL
 - [ ] Blockchain interaction
 
 ### Technologies
@@ -17,10 +18,11 @@
 - [x] Elastic Search
 - [x] Kafka
 - [x] MongoDB
+- [x] Minikube
 - [ ] Google Cloud Platform deployment
 - [ ] Big Query
 - [ ] RabbitMQ
-- [ ] Minikube
+
 ### Technique
 - [ ] Database partition
 - [ ] Token decentralization
