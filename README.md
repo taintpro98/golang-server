@@ -10,7 +10,6 @@
 - [x] Peer to peer messages using Websocket, Kafka
 - [x] Messages storage using MongoDB
 - [x] File uploads
-- [ ] GraphQL
 - [ ] Blockchain interaction
 
 ### Technologies
@@ -19,6 +18,8 @@
 - [x] Kafka
 - [x] MongoDB
 - [x] Minikube
+- [ ] GraphQL
+- [ ] gRPC
 - [ ] Google Cloud Platform deployment
 - [ ] Big Query
 - [ ] RabbitMQ
@@ -163,3 +164,4 @@ go build -o bin/api cmd/api/main.go
 - [[Kafka] 1.Cài Đặt Kafka Server Trong 1 Phút](https://viblo.asia/p/kafka-1cai-dat-kafka-server-trong-1-phut-38X4E63XJN2)
 - [Building An SSH Chatroom With Go](https://medium.com/@alexfoleydevops/building-an-ssh-chatroom-with-go-6df65facd6cb)
 - [Multi-room Chat Application With WebSockets In Go And Vue.js (Part 2)](https://www.whichdev.com/building-a-multi-room-chat-application-with-websockets-in-go-and-vue-js-part-2/)
+- [Learn Golang + GraphQL + Relay](https://wehavefaces.net/learn-golang-graphql-relay-1-e59ea174a902)

@@ -6,6 +6,7 @@ import (
 	"golang-server/module/core/business"
 	"golang-server/module/core/storage"
 	"golang-server/module/core/transport"
+	graphql_transport "golang-server/module/core/transport/graphql"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/telegram"
 	"golang-server/token"
@@ -45,7 +46,9 @@ func RegisterRoutes(
 		storage.NewConstantStorage(cnf.Database, db),
 		storage.NewPostStorage(cnf.Database, db),
 	)
+
 	trpt := transport.NewTransport(biz)
+	graphTrpt := graphql_transport.NewGraphqlTransport()
 
 	engine.POST("/upload", trpt.Upload)
 	// routes
@@ -115,6 +118,9 @@ func RegisterRoutes(
 			roomApi.POST("", trpt.AdminCreateRoom)
 		}
 	}
+
+	// Sử dụng GraphQL handler với Gin
+	v1Api.POST("/graphql", graphTrpt.GetUserInfo)
 
 	// SSE Prototype
 	sseApi := engine.Group("/sse")
