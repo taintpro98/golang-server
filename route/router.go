@@ -4,6 +4,7 @@ import (
 	"golang-server/config"
 	"golang-server/middleware"
 	"golang-server/module/core/business"
+	"golang-server/module/core/schema"
 	"golang-server/module/core/storage"
 	"golang-server/module/core/transport"
 	graphql_transport "golang-server/module/core/transport/graphql"
@@ -28,6 +29,7 @@ func RegisterRoutes(
 	es *elasticsearch.Client,
 	bot telegram.ITelegramBot,
 ) {
+	userStorage := storage.NewUserStorage(cnf.Database, db)
 	// dependencies
 	biz := business.NewBiz(
 		jwtMaker,
@@ -35,7 +37,7 @@ func RegisterRoutes(
 		redisPubsub,
 		storage.NewElasticStorage(es),
 		storage.NewAsynqStorage(cnf.RedisQueue, redisQueue),
-		storage.NewUserStorage(cnf.Database, db),
+		userStorage,
 		storage.NewMovieStorage(cnf.Database, db),
 		storage.NewNotificationStorage(bot),
 		storage.NewSlotStorage(cnf.Database, db, redisClient),
@@ -48,8 +50,6 @@ func RegisterRoutes(
 	)
 
 	trpt := transport.NewTransport(biz)
-	graphTrpt := graphql_transport.NewGraphqlTransport()
-
 	engine.POST("/upload", trpt.Upload)
 	// routes
 	v1Api := engine.Group("/v1")
@@ -119,11 +119,15 @@ func RegisterRoutes(
 		}
 	}
 
-	// Sử dụng GraphQL handler với Gin
-	v1Api.POST("/graphql", graphTrpt.GraphQLHandler)
-
 	// SSE Prototype
 	sseApi := engine.Group("/sse")
 	sseApi.POST("/event-stream", trpt.HandleEventStreamPost)
 	sseApi.GET("/event-stream", trpt.HandleEventStreamGet)
+
+	// Sử dụng GraphQL handler với Gin
+	graphSchema, _ := schema.NewGraphSchema(
+		userStorage,
+	)
+	graphTrpt := graphql_transport.NewGraphqlTransport(graphSchema)
+	v1Api.POST("/graphql", graphTrpt.GraphQLHandler)
 }

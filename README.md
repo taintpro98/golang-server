@@ -18,7 +18,7 @@
 - [x] Kafka
 - [x] MongoDB
 - [x] Minikube
-- [ ] GraphQL
+- [x] GraphQL
 - [ ] gRPC
 - [ ] Google Cloud Platform deployment
 - [ ] Big Query
@@ -117,6 +117,15 @@ k6 run k6/loadtest.js
 - **Cross-Origin Issues:** WebSocket follows the same-origin policy, which might be a hurdle if not handled correctly
 
 ### GraphQL
+- Single query
+```
+{
+  user(id: "566b2ae2-5837-4b20-a030-b6825308c288") {
+    id
+    email
+  }
+}
+```
 - Query example
 ```
 {
@@ -188,3 +197,4 @@ go build -o bin/api cmd/api/main.go
 - [Building An SSH Chatroom With Go](https://medium.com/@alexfoleydevops/building-an-ssh-chatroom-with-go-6df65facd6cb)
 - [Multi-room Chat Application With WebSockets In Go And Vue.js (Part 2)](https://www.whichdev.com/building-a-multi-room-chat-application-with-websockets-in-go-and-vue-js-part-2/)
 - [Learn Golang + GraphQL + Relay](https://wehavefaces.net/learn-golang-graphql-relay-1-e59ea174a902)
+= [How to Build GraphQL APIs Using Go](https://earthly.dev/blog/build-graphql-apis-go/)
