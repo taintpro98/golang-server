@@ -116,6 +116,29 @@ k6 run k6/loadtest.js
 - **Connection Drops:** WebSocket connections can drop due to network issues or client disconnections. It’s crucial to have a reconnection strategy in place
 - **Cross-Origin Issues:** WebSocket follows the same-origin policy, which might be a hurdle if not handled correctly
 
+### GraphQL
+- Query example
+```
+{
+  users {
+    id
+    name
+    email
+  }
+}
+```
+- Mutation example
+```
+mutation {
+  createUser(name: "Jane Doe", email: "jane@example.com") {
+    id
+    name
+    email
+  }
+}
+```
+
+
 #### Demo
 - Open 2 terminals and run the following commands sequentially
 ```

@@ -6,7 +6,7 @@ import (
 	"github.com/graphql-go/handler"
 )
 
-// Định nghĩa User type
+// User type
 var userType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
 	Fields: graphql.Fields{
@@ -22,7 +22,11 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Định nghĩa Root Query
+var users = []map[string]interface{}{
+	{"id": "1", "name": "John Doe", "email": "john@example.com"},
+}
+
+// Root Query
 var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
@@ -36,14 +40,46 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				id, ok := p.Args["id"].(string)
 				if ok {
-					// Giả lập dữ liệu
-					return map[string]interface{}{
-						"id":    id,
-						"name":  "John Doe",
-						"email": "john@example.com",
-					}, nil
+					for _, user := range users {
+						if user["id"] == id {
+							return user, nil
+						}
+					}
 				}
 				return nil, nil
+			},
+		},
+		"users": &graphql.Field{
+			Type: graphql.NewList(userType),
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return users, nil
+			},
+		},
+	},
+})
+
+// Root Mutation
+var rootMutation = graphql.NewObject(graphql.ObjectConfig{
+	Name: "RootMutation",
+	Fields: graphql.Fields{
+		"createUser": &graphql.Field{
+			Type: userType,
+			Args: graphql.FieldConfigArgument{
+				"name": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+				"email": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				user := map[string]interface{}{
+					"id":    "2", // Thông thường, ID sẽ được tạo tự động
+					"name":  p.Args["name"].(string),
+					"email": p.Args["email"].(string),
+				}
+				users = append(users, user)
+				return user, nil
 			},
 		},
 	},
@@ -51,7 +87,8 @@ var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 
 // Tạo schema
 var schema, _ = graphql.NewSchema(graphql.SchemaConfig{
-	Query: rootQuery,
+	Query:    rootQuery,
+	Mutation: rootMutation,
 })
 
 type GraphqlTransport struct {
@@ -69,6 +106,6 @@ func NewGraphqlTransport() GraphqlTransport {
 	}
 }
 
-func (t GraphqlTransport) GetUserInfo(ctx *gin.Context) {
+func (t GraphqlTransport) GraphQLHandler(ctx *gin.Context) {
 	t.h.ServeHTTP(ctx.Writer, ctx.Request)
 }

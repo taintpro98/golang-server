@@ -120,7 +120,7 @@ func RegisterRoutes(
 	}
 
 	// Sử dụng GraphQL handler với Gin
-	v1Api.POST("/graphql", graphTrpt.GetUserInfo)
+	v1Api.POST("/graphql", graphTrpt.GraphQLHandler)
 
 	// SSE Prototype
 	sseApi := engine.Group("/sse")
