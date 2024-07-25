@@ -36,8 +36,8 @@ func (u movieStorage) tableName() string {
 	return model.MovieModel{}.TableName()
 }
 
-func (s movieStorage) BuildQuery(filter dto.FilterMovie) *gorm.DB {
-	query := s.table(s.tableName())
+func (s movieStorage) BuildQuery(ctx context.Context, filter dto.FilterMovie) *gorm.DB {
+	query := s.table(ctx, s.tableName())
 	if filter.ID != "" {
 		query = query.Where("id = ?", filter.ID)
 	}
@@ -50,7 +50,7 @@ func (u movieStorage) FindOne(ctx context.Context, filter dto.FilterMovie) (mode
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -62,7 +62,7 @@ func (u movieStorage) Count(ctx context.Context, filter dto.FilterMovie) (*int64
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 	})
 }
 
@@ -73,7 +73,7 @@ func (u movieStorage) List(ctx context.Context, filter dto.FilterMovie) ([]model
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -91,6 +91,6 @@ func (u movieStorage) UpdateMany(ctx context.Context, filter dto.FilterMovie, da
 	return u.CUpdateMany(ctx, CommonStorageParams{
 		TableName: u.tableName(),
 		Data:      data,
-		Query:     u.BuildQuery(filter),
+		Query:     u.BuildQuery(ctx, filter),
 	})
 }

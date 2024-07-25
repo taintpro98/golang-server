@@ -8,8 +8,12 @@ import (
 	"strings"
 	"time"
 
+	"golang-server/pkg/tracing"
+
 	"github.com/inhies/go-bytesize"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
@@ -201,6 +205,8 @@ func Init(envi string) (config Config) {
 			),
 		),
 	)
+
+	log.Logger = zerolog.New(os.Stderr).With().Timestamp().Logger().With().Caller().Logger().Hook(tracing.TracingHook{}).Level(zerolog.DebugLevel)
 	if err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}

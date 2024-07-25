@@ -17,6 +17,11 @@ func (c CustomErr) Error() string {
 }
 
 var (
+	ErrNilResponse = CustomErr{
+		HttpStatusCode: http.StatusServiceUnavailable,
+		Code:           http.StatusServiceUnavailable,
+		Msg:            "External service is unavailable",
+	}
 	ErrUnauthorized = CustomErr{
 		HttpStatusCode: http.StatusUnauthorized,
 		Code:           http.StatusUnauthorized,

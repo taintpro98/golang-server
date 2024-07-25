@@ -3,9 +3,9 @@ package constants
 const MBatchSize = 100
 
 const (
-	TraceID      string = "request_id"
-	KeyRequestID string = "X-REQUEST-ID"
-	XUserID      string = "x-user-id"
+	TraceID    string = "request_id"
+	XUserID    string = "x-user-id"
+	XRequestID string = "x-request-id"
 )
 
 const (

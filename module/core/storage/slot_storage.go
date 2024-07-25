@@ -44,8 +44,8 @@ func (u slotStorage) tableName() string {
 	return model.SlotModel{}.TableName()
 }
 
-func (s slotStorage) BuildQuery(filter dto.FilterSlot) *gorm.DB {
-	query := s.table(s.tableName())
+func (s slotStorage) BuildQuery(ctx context.Context, filter dto.FilterSlot) *gorm.DB {
+	query := s.table(ctx, s.tableName())
 	if filter.MovieID != "" {
 		query = query.Where("movie_id = ?", filter.MovieID)
 	}
@@ -61,7 +61,7 @@ func (u slotStorage) Count(ctx context.Context, filter dto.FilterSlot) (*int64, 
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 	})
 }
 
@@ -72,7 +72,7 @@ func (u slotStorage) FindOne(ctx context.Context, filter dto.FilterSlot) (model.
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -109,7 +109,7 @@ func (u slotStorage) List(ctx context.Context, filter dto.FilterSlot) ([]model.S
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -127,6 +127,6 @@ func (u slotStorage) UpdateMany(ctx context.Context, filter dto.FilterSlot, data
 	return u.CUpdateMany(ctx, CommonStorageParams{
 		TableName: u.tableName(),
 		Data:      data,
-		Query:     u.BuildQuery(filter),
+		Query:     u.BuildQuery(ctx, filter),
 	})
 }

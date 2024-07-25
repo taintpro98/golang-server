@@ -2,19 +2,48 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"golang-server/pkg/logger"
+	"golang-server/pkg/constants"
+	"golang-server/pkg/tracing"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 func LogRequestInfo() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		logger.Info(ctx, "log request...")
-		start := time.Now()
-		// Xử lý yêu cầu
-		ctx.Next()
+	return func(c *gin.Context) {
+		requestID := c.GetHeader(constants.XRequestID)
+		if requestID == "" {
+			requestID = tracing.GenerateTraceID()
+		}
 
+		c.Set(constants.TraceID, requestID)
+		c.Header(constants.XRequestID, requestID)
+
+		start := time.Now()
+		c.Next()
 		elapsed := time.Since(start)
-		logger.Info(ctx, fmt.Sprintf("Request latency: %v", elapsed))
+
+		statusCode := c.Writer.Status()
+		if statusCode >= 400 {
+			log.Err(c.Err()).Ctx(c).
+				Str("method", c.Request.Method).
+				Str("path", c.FullPath()).
+				Str("raw_path", c.Request.URL.Path).
+				Str("query", c.Request.URL.RawQuery).
+				Int("status", statusCode).
+				Str("latency", fmt.Sprintf("%v", elapsed)).
+				// RawJSON("response_body", w.body.Bytes()).
+				Msg("Response handled with error")
+		} else {
+			log.Info().Ctx(c).
+				Str("method", c.Request.Method).
+				Str("path", c.FullPath()).
+				Str("raw_path", c.Request.URL.Path).
+				Str("query", c.Request.URL.RawQuery).
+				Int("status", statusCode).
+				Str("latency", fmt.Sprintf("%v", elapsed)).
+				Msg("Response handled successfully")
+		}
 	}
 }

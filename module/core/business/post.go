@@ -5,13 +5,12 @@ import (
 	"golang-server/module/core/dto"
 	"golang-server/module/core/model"
 	"golang-server/pkg/logger"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (b biz) CreatePost(ctx context.Context, userID string, data dto.CreatePostRequest) (dto.CreatePostResponse, error) {
-	logger.Info(ctx, "biz CreatePost", logger.LogField{
-		Key:   "data",
-		Value: data,
-	})
+	log.Info().Interface("data", data).Msg("biz CreatePost")
 	var response dto.CreatePostResponse
 	insertPost := model.PostModel{
 		UserID:  userID,

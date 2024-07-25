@@ -45,8 +45,8 @@ func (u roomStorage) tableName() string {
 	return model.RoomModel{}.TableName()
 }
 
-func (s roomStorage) BuildQuery(filter dto.FilterRoom) *gorm.DB {
-	query := s.table(s.tableName())
+func (s roomStorage) BuildQuery(ctx context.Context, filter dto.FilterRoom) *gorm.DB {
+	query := s.table(ctx, s.tableName())
 	if filter.ID != 0 {
 		query = query.Where("id = ?", filter.ID)
 	}
@@ -58,7 +58,7 @@ func (u roomStorage) Count(ctx context.Context, filter dto.FilterRoom) (*int64, 
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 	})
 }
 
@@ -68,7 +68,7 @@ func (u roomStorage) FindOne(ctx context.Context, filter dto.FilterRoom) (model.
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -80,7 +80,7 @@ func (u roomStorage) List(ctx context.Context, filter dto.FilterRoom) ([]model.R
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -119,6 +119,6 @@ func (u roomStorage) UpdateMany(ctx context.Context, filter dto.FilterRoom, data
 	return u.CUpdateMany(ctx, CommonStorageParams{
 		TableName: u.tableName(),
 		Data:      data,
-		Query:     u.BuildQuery(filter),
+		Query:     u.BuildQuery(ctx, filter),
 	})
 }

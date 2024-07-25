@@ -8,6 +8,8 @@ import (
 	"golang-server/module/core/dto"
 	"golang-server/pkg/logger"
 
+	"github.com/rs/zerolog/log"
+
 	"gorm.io/gorm"
 )
 
@@ -24,21 +26,17 @@ type commonStorage struct {
 	configDb config.DatabaseConfig
 }
 
-func (s commonStorage) table(tableName string) *gorm.DB {
-	return s.db.Table(fmt.Sprintf("%s.%s", s.configDb.Schema, tableName))
+func (s commonStorage) table(ctx context.Context, tableName string) *gorm.DB {
+	return s.db.Table(fmt.Sprintf("%s.%s", s.configDb.Schema, tableName)).WithContext(ctx)
 }
 
 func (s commonStorage) log(ctx context.Context, funcName string, param CommonStorageParams) {
-	logger.Info(ctx, fmt.Sprintf("%s %s table", funcName, param.TableName), logger.LogField{
-		Key:   "data",
-		Value: param.Data,
-	}, logger.LogField{
-		Key:   "filter",
-		Value: param.Filter,
-	}, logger.LogField{
-		Key:   "common_filter",
-		Value: param.CommonFilter,
-	})
+	log.Info().
+		Ctx(ctx).
+		Interface("data", param.Data).
+		Interface("filter", param.Filter).
+		Interface("common_filter", param.CommonFilter).
+		Msg(fmt.Sprintf("%s %s table", funcName, param.TableName))
 }
 
 func (s commonStorage) CCount(ctx context.Context, param CommonStorageParams) (*int64, error) {
@@ -106,7 +104,7 @@ func (s commonStorage) CList(ctx context.Context, param CommonStorageParams) err
 func (s commonStorage) CInsert(ctx context.Context, param CommonStorageParams) error {
 	s.log(ctx, "CInsert", param)
 
-	tx := s.table(param.TableName).Create(param.Data)
+	tx := s.table(ctx, param.TableName).Create(param.Data)
 	if tx.Error != nil {
 		logger.Error(
 			ctx,
@@ -120,7 +118,7 @@ func (s commonStorage) CInsert(ctx context.Context, param CommonStorageParams) e
 func (s commonStorage) CInsertBatch(ctx context.Context, param CommonStorageParams) error {
 	s.log(ctx, "CInsertBatch", param)
 	// Create a transaction
-	tx := s.table(param.TableName).Begin()
+	tx := s.table(ctx, param.TableName).Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			logger.Info(ctx, fmt.Sprintf("rollback CInsertBatch %s", param.TableName))

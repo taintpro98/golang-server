@@ -43,8 +43,8 @@ func (u userStorage) tableName() string {
 	return model.UserModel{}.TableName()
 }
 
-func (s userStorage) BuildQuery(filter dto.FilterUser) *gorm.DB {
-	query := s.table(s.tableName())
+func (s userStorage) BuildQuery(ctx context.Context, filter dto.FilterUser) *gorm.DB {
+	query := s.table(ctx, s.tableName())
 	if filter.ID != "" {
 		query = query.Where("id = ?", filter.ID)
 	}
@@ -63,7 +63,7 @@ func (u userStorage) Count(ctx context.Context, filter dto.FilterUser) (*int64, 
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 	})
 }
 
@@ -73,7 +73,7 @@ func (u userStorage) FindOne(ctx context.Context, filter dto.FilterUser) (model.
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err
@@ -93,7 +93,7 @@ func (u userStorage) List(ctx context.Context, filter dto.FilterUser) ([]model.U
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err

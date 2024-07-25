@@ -15,38 +15,63 @@ import (
 	"time"
 )
 
+type CallbackFunc func(body []byte) error
+
 type DoRequestParam struct {
-	Request *http.Request
-	Headers map[string]string
-	Output  interface{}
+	Request      *http.Request
+	Headers      map[string]string
+	ErrorHandler CallbackFunc
 }
 
 type HttpClient struct {
 	Client *http.Client
+	Token  string
+	ApiKey string
 }
 
-func (c HttpClient) DoRequest(ctx context.Context, param DoRequestParam) error {
+func (c HttpClient) DoRequest(ctx context.Context, param DoRequestParam, output interface{}, backupOutput *string) error {
 	param.Request.Header.Add("Content-Type", "application/json")
+	if c.Token != "" {
+		param.Request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.Token))
+	}
+	if c.ApiKey != "" {
+		param.Request.Header.Add("apikey", c.ApiKey)
+	}
 	for key, value := range param.Headers {
 		param.Request.Header.Add(key, value)
 	}
 	requestID := ctx.Value(constants.TraceID)
 	if requestID != nil {
-		param.Request.Header.Add(constants.KeyRequestID, fmt.Sprintf("%s", requestID))
+		param.Request.Header.Add(constants.XRequestID, fmt.Sprintf("%s", requestID))
 	}
 
+	reqClone, err := CloneRequest(param.Request)
+	if err != nil {
+		logger.Error(ctx, err, "clone request error")
+	}
 	start := time.Now()
 	res, err := c.Client.Do(param.Request)
 	end := time.Since(start)
 
 	if err != nil {
-		logger.LogInfoRequest(ctx, end, *param.Request, http.Response{}, nil, nil)
+		logger.LogInfoRequest(ctx, end, *reqClone, http.Response{}, nil, nil)
+		if backupOutput != nil {
+			tmp := err.Error()
+			*backupOutput = tmp
+		}
 		var netErr net.Error
 		ok := errors.As(err, &netErr)
 		if ok && netErr.Timeout() {
 			return e.ErrTimeout
 		}
 		return err
+	}
+	if res == nil {
+		logger.LogInfoRequest(ctx, end, *reqClone, http.Response{}, nil, nil)
+		if backupOutput != nil {
+			*backupOutput = e.ErrNilResponse.Msg
+		}
+		return e.ErrNilResponse
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -55,22 +80,31 @@ func (c HttpClient) DoRequest(ctx context.Context, param DoRequestParam) error {
 		}
 	}(res.Body)
 	body, err := io.ReadAll(res.Body)
-	logger.LogInfoRequest(ctx, end, *param.Request, *res, body, err)
 	if err != nil {
 		return err
 	}
-
-	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
-		var errorBody e.CustomErr
-		if err := json.Unmarshal(body, &errorBody); err != nil {
-			return err
-		}
-		errorBody.HttpStatusCode = res.StatusCode
-		return errorBody
+	logger.LogInfoRequest(ctx, end, *reqClone, *res, body, err)
+	if backupOutput != nil {
+		tmp := string(body)
+		*backupOutput = tmp
 	}
-	if param.Output != nil {
-		if err := json.Unmarshal(body, param.Output); err != nil {
-			logger.Error(ctx, err, "")
+
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated && res.StatusCode != http.StatusAccepted {
+		var errorOutput e.CustomErr
+
+		if param.ErrorHandler != nil {
+			tmp := param.ErrorHandler(body)
+			okErr := errors.As(tmp, &errorOutput)
+			if !okErr {
+				return tmp
+			}
+		}
+		errorOutput.HttpStatusCode = res.StatusCode
+		return errorOutput
+	}
+	if output != nil {
+		if err := json.Unmarshal(body, output); err != nil {
+			logger.Error(ctx, err, "unmarshal response body error")
 			return err
 		}
 	}

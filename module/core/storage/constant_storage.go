@@ -32,7 +32,7 @@ func NewConstantStorage(cfg config.DatabaseConfig, db *gorm.DB) IConstantStorage
 // FindOne implements IConstantStorage.
 func (s constantStorage) FindOne(ctx context.Context, code constants.GolangServerConstant) (model.ConstantModel, error) {
 	var result model.ConstantModel
-	err := s.table("constants").Where("code = ?", code).First(&result).Error
+	err := s.table(ctx, "constants").Where("code = ?", code).First(&result).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return result, err
 	}
@@ -41,5 +41,5 @@ func (s constantStorage) FindOne(ctx context.Context, code constants.GolangServe
 
 // UpdateMany implements IConstantStorage.
 func (s constantStorage) UpdateMany(ctx context.Context, code constants.GolangServerConstant, value string) error {
-	return s.table("constants").Where("code = ?", code).Update("value", value).Error
+	return s.table(ctx, "constants").Where("code = ?", code).Update("value", value).Error
 }

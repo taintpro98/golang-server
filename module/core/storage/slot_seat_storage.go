@@ -38,8 +38,8 @@ func (u slotSeatStorage) tableName() string {
 	return model.SlotSeatModel{}.TableName()
 }
 
-func (s slotSeatStorage) BuildQuery(filter dto.FilterSlotSeat) *gorm.DB {
-	query := s.table(s.tableName())
+func (s slotSeatStorage) BuildQuery(ctx context.Context, filter dto.FilterSlotSeat) *gorm.DB {
+	query := s.table(ctx, s.tableName())
 	if filter.SlotID != "" {
 		query = query.Where("slot_id = ?", filter.SlotID)
 	}
@@ -52,7 +52,7 @@ func (u slotSeatStorage) List(ctx context.Context, filter dto.FilterSlotSeat) ([
 		TableName:    u.tableName(),
 		Filter:       filter,
 		CommonFilter: filter.CommonFilter,
-		Query:        u.BuildQuery(filter),
+		Query:        u.BuildQuery(ctx, filter),
 		Data:         &result,
 	})
 	return result, err

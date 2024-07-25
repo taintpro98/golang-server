@@ -43,8 +43,7 @@ func (c httpClientApi) GetPrices(ctx context.Context, data http_integration_dto.
 	}
 	if err = c.DoRequest(ctx, httpclient.DoRequestParam{
 		Request: req,
-		Output:  result,
-	}); err != nil {
+	}, &result, nil); err != nil {
 		logger.Error(ctx, err, "Error sending request to clevertap push notification")
 		return result, err
 	}
