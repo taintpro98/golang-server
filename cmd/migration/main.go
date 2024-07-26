@@ -12,14 +12,13 @@ import (
 )
 
 func main() {
-	envi := flag.String("e", "", "Environment option")
 	dir := flag.String("dir", "migrations", "Path to migrations")
 	flag.Parse()
 	args := flag.Args()
 	command := args[0]
 
 	ctx := context.Background()
-	cnf := config.Init(*envi)
+	cnf := config.Init()
 	dsn := database.GetDatabaseDSN(cnf.Database)
 	db, err := goose.OpenDBWithDriver("postgres", dsn)
 	if err != nil {

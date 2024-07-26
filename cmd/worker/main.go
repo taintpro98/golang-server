@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"golang-server/app/worker"
 	"golang-server/config"
 	"golang-server/pkg/cache"
@@ -18,9 +17,7 @@ import (
 
 func main() {
 	logger.InitLogger("worker-service")
-	envi := flag.String("e", "", "Environment option")
-	flag.Parse()
-	cnf := config.Init(*envi)
+	cnf := config.Init()
 	ctx := context.Background()
 
 	postgresqlDB, err := database.NewPostgresqlDatabase(ctx, cnf.Database)

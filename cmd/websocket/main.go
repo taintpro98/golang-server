@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"golang-server/config"
 	"golang-server/pkg/cache"
@@ -25,9 +24,7 @@ import (
 
 func main() {
 	logger.InitLogger("websocket-service")
-	envi := flag.String("e", "", "Environment option")
-	flag.Parse()
-	cnf := config.Init(*envi)
+	cnf := config.Init()
 	ctx := context.Background()
 
 	clients := sync.Map{}

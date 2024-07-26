@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"golang-server/config"
 	"golang-server/pkg/kafka"
@@ -122,9 +121,7 @@ func runKafkaConsumerGroup(ctx context.Context, cnf config.Config) {
 
 func main() {
 	logger.InitLogger("event-dispatcher-service")
-	envi := flag.String("e", "", "Environment option")
-	flag.Parse()
-	cnf := config.Init(*envi)
+	cnf := config.Init()
 	ctx := context.Background()
 
 	runKafkaConsumerGroup(ctx, cnf)

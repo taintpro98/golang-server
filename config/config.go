@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -184,7 +185,9 @@ func loadConfigByUrl(v *viper.Viper, configURL string) {
 	}
 }
 
-func Init(envi string) (config Config) {
+func Init() (config Config) {
+	envi := flag.String("e", "", "Environment option")
+	flag.Parse()
 	v := viper.New()
 	v.SetConfigType("yaml")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "__"))
@@ -192,7 +195,7 @@ func Init(envi string) (config Config) {
 
 	configUrl := getConfigUrl()
 	if configUrl == "" {
-		loadConfigByLocalPath(v, envi)
+		loadConfigByLocalPath(v, *envi)
 	} else {
 		loadConfigByUrl(v, configUrl)
 	}

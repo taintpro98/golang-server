@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"golang-server/config"
+	"golang-server/middleware"
 	fx_business "golang-server/module/fx/business"
 	"golang-server/module/fx/repository"
+	fx_transport "golang-server/module/fx/transport"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/database"
+	"golang-server/route"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 )
 
@@ -73,9 +78,37 @@ var ConnectionModule = fx.Module(
 	),
 )
 
+func NewGinEngine() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+	engine.Use(
+		middleware.LogRequestInfo(),
+		gin.Recovery(),
+	)
+	engine.Static("/static", "./static")
+
+	// Route chính hiển thị form upload
+	engine.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "upload.html", nil)
+	})
+
+	route.RegisterHealthCheckRoute(engine)
+	return engine
+}
+
 func main() {
+	// cnf := config.Init()
+	ctx := context.Background()
 	app := fx.New(
+		fx.Provide(
+			config.Init,
+			func() context.Context {
+				return ctx
+			},
+		),
 		ConnectionModule,
+		fx.Provide(fx_transport.NewTransport),
+		fx.Provide(NewGinEngine),
 		repository.RepositoryModule,
 		fx_business.BusinessModule,
 		// fx.Invoke(func (authenBiz )  {
