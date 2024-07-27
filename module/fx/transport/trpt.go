@@ -1,12 +1,21 @@
 package fx_transport
 
-import "github.com/gin-gonic/gin"
+import (
+	fx_business "golang-server/module/fx/business"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Transport struct {
+	authBiz fx_business.IAuthenticateBiz
 }
 
-func NewTransport() *Transport {
-	return &Transport{}
+func NewTransport(
+	authBiz fx_business.IAuthenticateBiz,
+) *Transport {
+	return &Transport{
+		authBiz: authBiz,
+	}
 }
 
 func (t *Transport) Register(ctx *gin.Context) {

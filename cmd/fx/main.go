@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"golang-server/config"
 	"golang-server/middleware"
@@ -10,65 +11,13 @@ import (
 	fx_transport "golang-server/module/fx/transport"
 	"golang-server/pkg/cache"
 	"golang-server/pkg/database"
+	"golang-server/pkg/logger"
 	"golang-server/route"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 )
-
-// Service interface
-type Service interface {
-	GetData() string
-}
-
-// Service implementation
-type serviceImpl struct{}
-
-func (s *serviceImpl) GetData() string {
-	return "Hello, World!"
-}
-
-// Handler that uses the Service
-type Handler struct {
-	service Service
-}
-
-func NewHandler(service Service) *Handler {
-	return &Handler{service: service}
-}
-
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	data := h.service.GetData()
-	fmt.Fprintln(w, data)
-}
-
-func NewService() Service {
-	return &serviceImpl{}
-}
-
-func NewMux(handler *Handler) *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.Handle("/", handler)
-	return mux
-}
-
-func startHTTPServer(lc fx.Lifecycle, mux *http.ServeMux) {
-	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: mux,
-	}
-
-	lc.Append(fx.Hook{
-		OnStart: func(context.Context) error {
-			go srv.ListenAndServe()
-			return nil
-		},
-		OnStop: func(ctx context.Context) error {
-			return srv.Shutdown(ctx)
-		},
-	})
-}
 
 var ConnectionModule = fx.Module(
 	"connection",
@@ -96,24 +45,44 @@ func NewGinEngine() *gin.Engine {
 	return engine
 }
 
+func startHTTPServer(lc fx.Lifecycle, cnf config.Config, engine *gin.Engine) {
+	server := http.Server{
+		Addr:    cnf.AppInfo.ApiPort,
+		Handler: engine,
+	}
+
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			logger.Info(ctx, fmt.Sprintf("Running API on port %s...", cnf.AppInfo.ApiPort))
+			err := server.ListenAndServe()
+			if err != nil && !errors.Is(err, http.ErrServerClosed) {
+				logger.Error(ctx, err, "Run app error")
+				return err
+			}
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			return server.Shutdown(ctx)
+		},
+	})
+}
+
 func main() {
 	// cnf := config.Init()
-	ctx := context.Background()
+	// ctx := context.Background()
 	app := fx.New(
 		fx.Provide(
 			config.Init,
-			func() context.Context {
-				return ctx
-			},
+			// func() context.Context {
+			// 	return ctx
+			// },
 		),
 		ConnectionModule,
 		fx.Provide(fx_transport.NewTransport),
 		fx.Provide(NewGinEngine),
 		repository.RepositoryModule,
 		fx_business.BusinessModule,
-		// fx.Invoke(func (authenBiz )  {
-
-		// }),
+		fx.Invoke(startHTTPServer),
 	)
 
 	app.Run()
