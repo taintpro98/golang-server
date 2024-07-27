@@ -2,6 +2,7 @@ package fx_transport
 
 import (
 	fx_business "golang-server/module/fx/business"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +17,13 @@ func NewTransport(
 	return &Transport{
 		authBiz: authBiz,
 	}
+}
+
+func HandleHealthCheck(ctx *gin.Context) {
+	ctx.JSON(
+		http.StatusOK,
+		nil,
+	)
 }
 
 func (t *Transport) Register(ctx *gin.Context) {

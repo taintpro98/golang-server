@@ -1,16 +1,21 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/golang-server', '.']
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/golang-server']
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: [
-      'run', 'deploy', 'golang-server',
-      '--image', 'gcr.io/$PROJECT_ID/golang-server',
-      '--region', 'YOUR_REGION',
-      '--platform', 'managed',
-      '--allow-unauthenticated',
-      '--set-env-vars', 'EXAMPLE_VAR=example_value,ANOTHER_VAR=another_value'
-    ]
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/golang-server", "."]
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/golang-server"]
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "run",
+        "deploy",
+        "golang-server",
+        "--image",
+        "gcr.io/$PROJECT_ID/golang-server",
+        "--region",
+        "us-central1",
+        "--platform",
+        "managed",
+        "--allow-unauthenticated",
+      ]
 images:
-  - 'gcr.io/$PROJECT_ID/my-go-app'
+  - "gcr.io/$PROJECT_ID/my-go-app"

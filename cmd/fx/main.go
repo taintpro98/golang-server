@@ -53,12 +53,13 @@ func startHTTPServer(lc fx.Lifecycle, cnf config.Config, engine *gin.Engine) {
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			logger.Info(ctx, fmt.Sprintf("Running API on port %s...", cnf.AppInfo.ApiPort))
-			err := server.ListenAndServe()
-			if err != nil && !errors.Is(err, http.ErrServerClosed) {
-				logger.Error(ctx, err, "Run app error")
-				return err
-			}
+			go func() {
+				logger.Info(ctx, fmt.Sprintf("Running API on port %s...", cnf.AppInfo.ApiPort))
+				err := server.ListenAndServe()
+				if err != nil && !errors.Is(err, http.ErrServerClosed) {
+					logger.Error(ctx, err, "Run app error")
+				}
+			}()
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
